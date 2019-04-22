@@ -8,6 +8,7 @@ public class BallsManager : MonoBehaviour
 {
     public static BallsManager Instance;
 
+    public Transform ballsContainer;
     public GameObject ballPrefab;
 
     [Header("Balls_Settings")]
@@ -21,8 +22,11 @@ public class BallsManager : MonoBehaviour
     [Header("Throwing_Settings")] 
     public float flyForce_MIN;
     public float flyForce_MAX;
-     
 
+    public float flyDirection_from;
+    public float flyDirection_to;
+
+    private Dictionary<GameObject, Ball> _balls;
     private Ball _ballToThrow;
      
     private CorridorsConductor _corridorsConductor;
@@ -41,13 +45,15 @@ public class BallsManager : MonoBehaviour
 
     private void Start()
     {
+        _balls = new Dictionary<GameObject, Ball>();
+
         InstantiateBalls(); 
     }
 
     private void InstantiateBalls()
     {
         float offsetX = 0.25f;
-        float tempOffsetX = offsetX;
+        float tempOffsetX = 0;
         float offsetY = 0.25f;
         float tempOffsetY = 0;
 
@@ -56,11 +62,14 @@ public class BallsManager : MonoBehaviour
             Vector3 ballPos = new Vector3(ballsSpawnPosition.position.x + tempOffsetX, ballsSpawnPosition.position.y + tempOffsetY);
             tempOffsetX += offsetX;
 
-            Instantiate(ballPrefab, ballPos, Quaternion.identity);
+            GameObject newBall = Instantiate(ballPrefab, ballPos, Quaternion.identity);
+            newBall.transform.parent = ballsContainer;
+            Ball ballScript = newBall.GetComponent<Ball>();
+            _balls.Add(newBall, ballScript);
 
-            if (i / 5 == 0)
+            if (i % 5 == 0)
             {
-                tempOffsetX = offsetX;
+                tempOffsetX = 0;
                 tempOffsetY += offsetY;
             }
         }
@@ -86,7 +95,7 @@ public class BallsManager : MonoBehaviour
         {
             while (_corridorsConductor.IsPointOccupied(indexOfPoint, corridorType))
             {
-                yield return new WaitForSeconds(0.3f); 
+                yield return new WaitForSeconds(0.2f); 
             }
             if (indexOfPoint > 0)  
             {
@@ -139,7 +148,7 @@ public class BallsManager : MonoBehaviour
     private void ThrowBallToPile(Ball ball)
     {
         Quaternion direction = Quaternion.Euler(0, 0, 20); 
-        float impulseForce = 12f; 
+        float impulseForce = 9f; 
          
         ball.Fly(direction, impulseForce, BallMaterial.Standard, BallLayer.Solid); 
     }
@@ -162,7 +171,7 @@ public class BallsManager : MonoBehaviour
             {
                 while (_ballToThrow == null)
                 {
-                    yield return new WaitForSeconds(0.5f);
+                    yield return new WaitForSeconds(0.2f);
                 }
             }
             int lastPointDownCorridor = _corridorsConductor.GetPathLength(CorridorType.Down);
@@ -179,7 +188,7 @@ public class BallsManager : MonoBehaviour
      
     private Quaternion GetDirection()
     {
-        float angleZ = Random.Range(-20, -35);
+        float angleZ = Random.Range(flyDirection_from, flyDirection_to);
         Quaternion newRotation = Quaternion.Euler(0, 0, -50); // return angeZ
         return newRotation;
     }
@@ -188,4 +197,20 @@ public class BallsManager : MonoBehaviour
     {
         return Random.Range(flyForce_MIN, flyForce_MAX);
     } 
+
+    public Ball this[GameObject ballObj]
+    {
+        get
+        {
+            if (_balls.ContainsKey(ballObj))
+            {
+                return _balls[ballObj];
+            }
+            else
+            {
+                Debug.LogError("Key doesn't exist!");
+                return null;
+            }
+        }
+    }
 }

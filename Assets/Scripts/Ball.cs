@@ -19,25 +19,29 @@ public class Ball : MonoBehaviour
 
     public Color[] startColors;
     public Vector3[] scaleSizes;
+    public float[] tailWidth;
 
     bool _inGame = true;
-    bool _inCorridor = false;
+    int points = 1;
      
     Collider2D _collider2D;
     Rigidbody2D _rb2D;
     SpriteRenderer _sprite;
+    TrailRenderer _trail;
      
     private void Start()
     {
         _rb2D = GetComponent<Rigidbody2D>();
         _collider2D = GetComponent<Collider2D>();
         _sprite = GetComponentInChildren<SpriteRenderer>();
+        _trail = GetComponent<TrailRenderer>();
 
         SetColliderMaterial(BallMaterial.Standard);
         SetRigidbodyType(RigidbodyType2D.Dynamic);
 
-        //SetupRandomScale();
+        SetupRandomScale();
         SetupRandomColor();
+        ActiveTrail(false);
     }
      
     private void OutOfGame()
@@ -45,16 +49,24 @@ public class Ball : MonoBehaviour
         _inGame = false;
     }
 
-    private void SetupRandomScale()
-    {
-        int index = Random.Range(0, startColors.Length - 1);
-        _sprite.color = startColors[index];
-    }
-
     private void SetupRandomColor()
     {
-        int index = Random.Range(0, scaleSizes.Length - 1);
+        int index = Random.Range(0, startColors.Length); 
+        _sprite.color = startColors[index]; 
+    }
+
+    private void SetupRandomScale()
+    {
+        int index = Random.Range(0, scaleSizes.Length);
         transform.localScale = scaleSizes[index];
+
+        _trail.startWidth = tailWidth[index];
+        _trail.endWidth = 0; 
+    }
+
+    private void ActiveTrail(bool value)
+    {
+        _trail.enabled = value;
     }
 
     private void SetColliderMaterial(BallMaterial ballMaterial)
@@ -101,16 +113,16 @@ public class Ball : MonoBehaviour
                     BallMaterial ballMaterial, BallLayer ballLayer)  
     {
         if (_rb2D.bodyType == RigidbodyType2D.Static)
-        {
-            SetRigidbodyType(RigidbodyType2D.Dynamic);
+        { 
+            SetRigidbodyType(RigidbodyType2D.Dynamic); 
         }
         SetColliderMaterial(ballMaterial);
         SetLayer(ballLayer);
+        ActiveTrail(true);
 
         this.gameObject.transform.rotation = rotation; 
 
         _rb2D.AddForce(this.transform.up * impulseForce, ForceMode2D.Impulse);
-
     } 
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -118,24 +130,36 @@ public class Ball : MonoBehaviour
         if (other.tag == "Corridor_DOWN")
         { 
             SetRigidbodyType(RigidbodyType2D.Static);
+            ActiveTrail(false);
 
             BallsManager.Instance.GoCorridorDown(this);
         }
         else if (other.tag == "Corridor_UP")
         {
-            SetRigidbodyType(RigidbodyType2D.Static); 
+            SetRigidbodyType(RigidbodyType2D.Static);
+            ActiveTrail(false); 
 
             BallsManager.Instance.GoCorridorUp(this);
         }
         else if (other.tag == "BallCatcher")
         {
             SetColliderMaterial(BallMaterial.Standard);
+            ActiveTrail(false);
         }
         else if (other.tag == "Ground")
         {
             SetColliderMaterial(BallMaterial.Standard);
+            SetLayer(BallLayer.Solid);
 
             OutOfGame();
+        }
+    }
+
+    public Color Color
+    {
+        get
+        {
+            return _sprite.color;
         }
     }
 }
