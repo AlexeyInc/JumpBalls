@@ -122,13 +122,13 @@ CircleCollider2D:
   m_GameObject: {fileID: 7639900366834866430}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 90c827183afc15b479eed7a3f5c88c55, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.002, y: 0.002}
   serializedVersion: 2
-  m_Radius: 0.12
+  m_Radius: 0.113
 --- !u!50 &7639900366834866425
 Rigidbody2D:
   serializedVersion: 4
@@ -141,7 +141,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 2.3
+  m_Mass: 1.5
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -162,4 +162,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed87dd100d32327418db1f5d82bf6d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speedMove: 0
+  bouncingMat: {fileID: 6200000, guid: 90c827183afc15b479eed7a3f5c88c55, type: 2}
+  solidMat: {fileID: 6200000, guid: 59e8f4f95402c5044b2cfdaeb5d17400, type: 2}
+  startColors:
+  - {r: 0.3215112, g: 0.8018868, b: 0.3448933, a: 0}
+  - {r: 0.8773585, g: 0.8678313, b: 0.25244746, a: 0}
+  scaleSizes:
+  - {x: 0.8, y: 0.8, z: 1}
+  - {x: 1, y: 1, z: 1}
+  - {x: 1.2, y: 1.2, z: 1}

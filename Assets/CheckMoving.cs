@@ -9,7 +9,12 @@ public class CheckMoving : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(StartMove());
+        this.gameObject.transform.rotation = Quaternion.Euler(0, 0, 20); ;
+
+        GetComponent<Rigidbody2D>().AddForce(this.transform.up * 5f, ForceMode2D.Impulse);
+
+        Debug.Log("push");
+        //StartCoroutine(StartMove());
     }
 
     IEnumerator StartMove()

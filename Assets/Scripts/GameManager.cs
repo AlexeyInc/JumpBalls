@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     void Start()
     { 
-        //StartCoroutine(GameLoop());
+        StartCoroutine(GameLoop());
     } 
 
     IEnumerator GameLoop()
@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 
             BallsManager.Instance.ThrowBalls(2);
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(2f);
         }
 
     }

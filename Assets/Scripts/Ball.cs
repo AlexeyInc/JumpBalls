@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum BallMaterial
 {
-    None, Bouncing
+    Standard, Bouncing
 }
 
 public enum BallLayer
@@ -14,21 +14,30 @@ public enum BallLayer
 
 public class Ball : MonoBehaviour
 {
+    public PhysicsMaterial2D bouncingMat;
+    public PhysicsMaterial2D solidMat;
+
+    public Color[] startColors;
+    public Vector3[] scaleSizes;
+
     bool _inGame = true;
     bool _inCorridor = false;
      
     Collider2D _collider2D;
     Rigidbody2D _rb2D;
-    PhysicsMaterial2D _bouncingMat;
-
+    SpriteRenderer _sprite;
+     
     private void Start()
     {
         _rb2D = GetComponent<Rigidbody2D>();
         _collider2D = GetComponent<Collider2D>();
-        _bouncingMat = _collider2D.sharedMaterial;
+        _sprite = GetComponentInChildren<SpriteRenderer>();
 
-        SetCollidermaterial(BallMaterial.None);
+        SetColliderMaterial(BallMaterial.Standard);
         SetRigidbodyType(RigidbodyType2D.Dynamic);
+
+        //SetupRandomScale();
+        SetupRandomColor();
     }
      
     private void OutOfGame()
@@ -36,25 +45,27 @@ public class Ball : MonoBehaviour
         _inGame = false;
     }
 
-    private void SetBallScale()
+    private void SetupRandomScale()
     {
-
+        int index = Random.Range(0, startColors.Length - 1);
+        _sprite.color = startColors[index];
     }
 
-    private void SetBallColor()
+    private void SetupRandomColor()
     {
-
+        int index = Random.Range(0, scaleSizes.Length - 1);
+        transform.localScale = scaleSizes[index];
     }
 
-    private void SetCollidermaterial(BallMaterial ballMaterial)
+    private void SetColliderMaterial(BallMaterial ballMaterial)
     {
         switch (ballMaterial)
         {
-            case BallMaterial.None:
-                _collider2D.sharedMaterial = null;
+            case BallMaterial.Standard:
+                _collider2D.sharedMaterial = solidMat;
                 break;
             case BallMaterial.Bouncing:
-                _collider2D.sharedMaterial = _bouncingMat;
+                _collider2D.sharedMaterial = bouncingMat;
                 break;
             default:
                 break;
@@ -89,17 +100,17 @@ public class Ball : MonoBehaviour
     public void Fly(Quaternion rotation, float impulseForce,
                     BallMaterial ballMaterial, BallLayer ballLayer)  
     {
-        //if (_rb2D.bodyType == RigidbodyType2D.Static)
-        //{ 
-        //}
+        if (_rb2D.bodyType == RigidbodyType2D.Static)
+        {
+            SetRigidbodyType(RigidbodyType2D.Dynamic);
+        }
+        SetColliderMaterial(ballMaterial);
+        SetLayer(ballLayer);
 
         this.gameObject.transform.rotation = rotation; 
 
-        _rb2D.AddForce(this.transform.up * impulseForce, ForceMode2D.Force);
+        _rb2D.AddForce(this.transform.up * impulseForce, ForceMode2D.Impulse);
 
-        SetRigidbodyType(RigidbodyType2D.Dynamic);
-        SetCollidermaterial(ballMaterial);
-        SetLayer(ballLayer);
     } 
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -112,9 +123,19 @@ public class Ball : MonoBehaviour
         }
         else if (other.tag == "Corridor_UP")
         {
-            SetRigidbodyType(RigidbodyType2D.Static);
+            SetRigidbodyType(RigidbodyType2D.Static); 
 
             BallsManager.Instance.GoCorridorUp(this);
+        }
+        else if (other.tag == "BallCatcher")
+        {
+            SetColliderMaterial(BallMaterial.Standard);
+        }
+        else if (other.tag == "Ground")
+        {
+            SetColliderMaterial(BallMaterial.Standard);
+
+            OutOfGame();
         }
     }
 }
