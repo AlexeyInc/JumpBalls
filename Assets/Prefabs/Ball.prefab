@@ -189,7 +189,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.15
+  m_Time: 0.18
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -280,3 +280,4 @@ MonoBehaviour:
   - 0.13
   - 0.17
   - 0.21
+  Points: 1

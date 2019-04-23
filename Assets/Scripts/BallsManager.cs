@@ -18,6 +18,7 @@ public class BallsManager : MonoBehaviour
     [Header("Corridors_Settings")]
     public float speedDownCorridor;
     public float speedUpCorridor;
+    public float upAcceleration;
 
     [Header("Throwing_Settings")] 
     public float flyForce_MIN;
@@ -135,7 +136,7 @@ public class BallsManager : MonoBehaviour
             while (ball.transform.position != targetPoint)
             {
                 ball.transform.position = Vector3.MoveTowards(ball.transform.position, targetPoint, localSpeed * Time.smoothDeltaTime);
-                localSpeed += 0.05f;//up acceleration
+                localSpeed += upAcceleration;
                 yield return new WaitForEndOfFrame();
             }
 
@@ -147,10 +148,10 @@ public class BallsManager : MonoBehaviour
 
     private void ThrowBallToPile(Ball ball)
     {
-        Quaternion direction = Quaternion.Euler(0, 0, 20); 
-        float impulseForce = 9f; 
+        Quaternion direction = Quaternion.Euler(0, 0, 60); 
+        float impulseForce = 5f; 
          
-        ball.Fly(direction, impulseForce, BallMaterial.Standard, BallLayer.Solid); 
+        ball.Fly(direction, impulseForce, BallMaterial.Standard, BallLayer.Solid, false);  
     }
 
     public void ThrowBalls(int count)
@@ -167,12 +168,16 @@ public class BallsManager : MonoBehaviour
     {
         while (_countBallsToThrow > 0)
         {
-            if (true) //check on balls more than 0 in game now
+            if (CountBallsInGame() > 0)  
             {
                 while (_ballToThrow == null)
                 {
                     yield return new WaitForSeconds(0.2f);
                 }
+            }
+            else
+            {
+                break;
             }
             int lastPointDownCorridor = _corridorsConductor.GetPathLength(CorridorType.Down);
             _corridorsConductor.SetOccupiedPointInPath(lastPointDownCorridor - 1, false, CorridorType.Down);
@@ -185,11 +190,24 @@ public class BallsManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f); //make more clear
         }
     }
+
+    private int CountBallsInGame()
+    {
+        int counter = 0;
+        foreach (var ball in _balls)
+        {
+            if (ball.Value.InGame)
+            {
+                counter++;
+            }
+        }
+        return counter;
+    }
      
     private Quaternion GetDirection()
     {
         float angleZ = Random.Range(flyDirection_from, flyDirection_to);
-        Quaternion newRotation = Quaternion.Euler(0, 0, -50); // return angeZ
+        Quaternion newRotation = Quaternion.Euler(0, 0, angleZ); // -50
         return newRotation;
     }
 

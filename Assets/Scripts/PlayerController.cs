@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
             Ball ballScript = BallsManager.Instance[other.gameObject];
             Color color = ballScript.Color;
 
-            
+            GameManager.Instance.UpdateScore(ballScript.Points);
 
             _collisionEffect.transform.position = other.transform.position; 
             _collisionEffect.ActiveParticle(color);

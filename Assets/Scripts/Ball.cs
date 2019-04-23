@@ -21,13 +21,13 @@ public class Ball : MonoBehaviour
     public Vector3[] scaleSizes;
     public float[] tailWidth;
 
-    bool _inGame = true;
-    int points = 1;
-     
-    Collider2D _collider2D;
-    Rigidbody2D _rb2D;
-    SpriteRenderer _sprite;
-    TrailRenderer _trail;
+    public bool InGame { get; set; } = true;
+    public int Points = 1;
+
+    private Collider2D _collider2D;
+    private Rigidbody2D _rb2D;
+    private SpriteRenderer _sprite;
+    private TrailRenderer _trail;
      
     private void Start()
     {
@@ -42,12 +42,7 @@ public class Ball : MonoBehaviour
         SetupRandomScale();
         SetupRandomColor();
         ActiveTrail(false);
-    }
-     
-    private void OutOfGame()
-    {
-        _inGame = false;
-    }
+    } 
 
     private void SetupRandomColor()
     {
@@ -103,14 +98,9 @@ public class Ball : MonoBehaviour
                 break;
         }
     }
-      
-    public bool InGame
-    {
-        get { return _inGame; }
-    }
-
+       
     public void Fly(Quaternion rotation, float impulseForce,
-                    BallMaterial ballMaterial, BallLayer ballLayer)  
+                    BallMaterial ballMaterial, BallLayer ballLayer, bool trail = true)  
     {
         if (_rb2D.bodyType == RigidbodyType2D.Static)
         { 
@@ -118,7 +108,7 @@ public class Ball : MonoBehaviour
         }
         SetColliderMaterial(ballMaterial);
         SetLayer(ballLayer);
-        ActiveTrail(true);
+        ActiveTrail(trail);
 
         this.gameObject.transform.rotation = rotation; 
 
@@ -143,15 +133,14 @@ public class Ball : MonoBehaviour
         }
         else if (other.tag == "BallCatcher")
         {
-            SetColliderMaterial(BallMaterial.Standard);
-            ActiveTrail(false);
+            SetColliderMaterial(BallMaterial.Standard); 
         }
         else if (other.tag == "Ground")
         {
             SetColliderMaterial(BallMaterial.Standard);
             SetLayer(BallLayer.Solid);
 
-            OutOfGame();
+            InGame = false;
         }
     }
 
@@ -161,5 +150,5 @@ public class Ball : MonoBehaviour
         {
             return _sprite.color;
         }
-    }
+    } 
 }

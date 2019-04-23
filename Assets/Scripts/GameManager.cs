@@ -4,10 +4,20 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
+
     public Text scoreText;
 
     string _defaultPlayerName = "Player_Alex";
     int _score;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        { 
+            Instance = this;
+        }
+    }
 
     void Start()
     {
