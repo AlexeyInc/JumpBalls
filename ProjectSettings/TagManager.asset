@@ -6,9 +6,10 @@ TagManager:
   tags:
   - Ball
   - Corridor
-  - BallCatcher
   - Corridor_DOWN
   - Corridor_UP
+  - BallCatcher
+  - Ground
   layers:
   - Default
   - TransparentFX

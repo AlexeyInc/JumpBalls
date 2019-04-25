@@ -1,19 +1,44 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-//Сейчас мячи просто передаются в инспекторе, в будущем менеджер должен создвать из сам
+public enum BonusUpgradeType
+{
+    Color, Scale, BonusBall
+}
 
 public class BallsManager : MonoBehaviour
 {
     public static BallsManager Instance;
 
-    public float speedInCorridor;
+    public Transform ballsContainer;
+    public GameObject ballPrefab;
 
+    [Header("Balls_Settings")]
+    public Transform ballsSpawnPosition;
+    public int countBalls;
+    public Color[] ballsColors;
+    public Vector3[] ballScaleSizes;
+    public float[] tailWidth; 
+
+    
+    [Header("Corridors_Settings")]
+    public float speedDownCorridor;
+    public float speedUpCorridor;
+    public float upAcceleration;
+
+    [Header("Throwing_Settings")] 
     public float flyForce_MIN;
     public float flyForce_MAX;
 
-    private Queue<Ball> _ballsToThrow;
+    public float flyDirection_from;
+    public float flyDirection_to;
+
+    private Dictionary<GameObject, Ball> _balls;
+    private Ball _ballToThrow; 
+     
     private CorridorsConductor _corridorsConductor;
 
     private float _curImpulseForse;
@@ -30,7 +55,34 @@ public class BallsManager : MonoBehaviour
 
     private void Start()
     {
-        _ballsToThrow = new Queue<Ball>();
+        _balls = new Dictionary<GameObject, Ball>();
+         
+        InstantiateBalls(); 
+    } 
+
+    private void InstantiateBalls()
+    {
+        float offsetX = 0.25f;
+        float tempOffsetX = 0;
+        float offsetY = 0.25f;
+        float tempOffsetY = 0;
+
+        for (int i = 0; i < countBalls; i++)
+        {
+            Vector3 ballPos = new Vector3(ballsSpawnPosition.position.x + tempOffsetX, ballsSpawnPosition.position.y + tempOffsetY);
+            tempOffsetX += offsetX;
+
+            GameObject newBall = Instantiate(ballPrefab, ballPos, Quaternion.identity);
+            newBall.transform.parent = ballsContainer;
+            Ball ballScript = newBall.GetComponent<Ball>();
+            _balls.Add(newBall, ballScript);
+
+            if (i % 5 == 0)
+            {
+                tempOffsetX = 0;
+                tempOffsetY += offsetY;
+            }
+        }
     }
 
     public void Initialize(CorridorsConductor corridorsConductor)
@@ -53,7 +105,7 @@ public class BallsManager : MonoBehaviour
         {
             while (_corridorsConductor.IsPointOccupied(indexOfPoint, corridorType))
             {
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.2f); 
             }
             if (indexOfPoint > 0)  
             {
@@ -65,14 +117,14 @@ public class BallsManager : MonoBehaviour
             Vector3 targetPoint = _corridorsConductor.GetPointPosition(indexOfPoint, corridorType);  
             while (ball.transform.position != targetPoint)
             {
-                ball.transform.position = Vector3.MoveTowards(ball.transform.position, targetPoint, speedInCorridor * Time.smoothDeltaTime);
+                ball.transform.position = Vector3.MoveTowards(ball.transform.position, targetPoint, speedDownCorridor * Time.smoothDeltaTime);
                 yield return new WaitForEndOfFrame(); 
             }
 
             indexOfPoint++;
         }
-         
-        _ballsToThrow.Enqueue(ball);
+
+        _ballToThrow = ball;
     }
      
     public void GoCorridorUp(Ball ball)
@@ -84,40 +136,28 @@ public class BallsManager : MonoBehaviour
     {
         CorridorType corridorType = CorridorType.Up;
         Vector3 lastPointInPath = _corridorsConductor.GetLastPointInPath(corridorType);
+        float localSpeed = speedUpCorridor;
 
         int indexOfPoint = 0;
         while (lastPointInPath != ball.transform.position)
-        {
-            while (_corridorsConductor.IsPointOccupied(indexOfPoint, corridorType))
-            {
-                yield return new WaitForSeconds(0.2f);
-            }
-            if (indexOfPoint > 0)
-            {
-                int prevPoint = indexOfPoint - 1;
-                _corridorsConductor.SetOccupiedPointInPath(prevPoint, false, corridorType);
-            }
-            _corridorsConductor.SetOccupiedPointInPath(indexOfPoint, true, corridorType);
-
+        { 
             Vector3 targetPoint = _corridorsConductor.GetPointPosition(indexOfPoint, corridorType);
             while (ball.transform.position != targetPoint)
             {
-                ball.transform.position = Vector3.MoveTowards(ball.transform.position, targetPoint, speedInCorridor * Time.smoothDeltaTime);
+                ball.transform.position = Vector3.MoveTowards(ball.transform.position, targetPoint, localSpeed * Time.smoothDeltaTime);
+                localSpeed += upAcceleration;
                 yield return new WaitForEndOfFrame();
             }
 
             indexOfPoint++;
         }
 
-        ThrowBallInPile(ball);
+        ThrowBall(ball, Quaternion.Euler(0, 0, 60), impulseForce: 5f);
     }
 
-    private void ThrowBallInPile(Ball ball)
-    {
-        Quaternion direction = Quaternion.Euler(0, 0, 20);//make more clear
-        float impulseForce = 5f;//make more clear
-
-        ball.Fly(direction, impulseForce, BallMaterial.None, BallLayer.Solid);//убедиться, что последние 2 параметра необходимы
+    private void ThrowBall(Ball ball, Quaternion direction, float impulseForce)
+    {  
+        ball.Fly(direction, impulseForce, BallMaterial.Standard, BallLayer.Solid, false);  
     }
 
     public void ThrowBalls(int count)
@@ -134,23 +174,107 @@ public class BallsManager : MonoBehaviour
     {
         while (_countBallsToThrow > 0)
         {
-            _ballsToThrow.Dequeue().Fly(_curDirection, _curImpulseForse, BallMaterial.Bouncing, BallLayer.Flying);
-            yield return new WaitForSeconds(0.5f);
+            if (CountBallsInGame() > 0)  
+            {
+                while (_ballToThrow == null)
+                {
+                    yield return new WaitForSeconds(0.2f);
+                }
+            }
+            else
+            {
+                break;
+            }
+            int lastPointDownCorridor = _corridorsConductor.GetPathLength(CorridorType.Down);
+            _corridorsConductor.SetOccupiedPointInPath(lastPointDownCorridor - 1, false, CorridorType.Down);
+
+            _ballToThrow.Fly(_curDirection, _curImpulseForse, BallMaterial.Bouncing, BallLayer.Flying);
+            _ballToThrow = null;
+
+            _countBallsToThrow--;
+
+            yield return new WaitForSeconds(0.2f); //make more clear
         }
     }
 
-
+    private int CountBallsInGame()
+    {
+        int counter = 0;
+        foreach (var ball in _balls)
+        {
+            if (ball.Value.InGame)
+            {
+                counter++;
+            }
+        }
+        return counter;
+    }
+     
     private Quaternion GetDirection()
     {
-        float angleZ = Random.Range(-20, -55);
-        Quaternion newRotation = Quaternion.Euler(0, 0, -50); // return angeZ
+        float angleZ = Random.Range(flyDirection_from, flyDirection_to);
+        Quaternion newRotation = Quaternion.Euler(0, 0, angleZ); // -50
         return newRotation;
     }
 
     private float GetImpulseForce()
     {
         return Random.Range(flyForce_MIN, flyForce_MAX);
+    } 
+
+    /// <summary>
+    /// CHECK!!@!
+    /// </summary>
+    /// <param name="ballObj"></param>
+    public void UpdateBall(GameObject ballObj, BonusUpgradeType ballUpgradeType)
+    {
+        switch (ballUpgradeType)
+        {
+            case BonusUpgradeType.Color:
+                int nextColorIndx = Array.IndexOf(ballsColors, _balls[ballObj].Color) + 1;
+                if (ballsColors.Length < nextColorIndx)
+                { 
+                    Color newColor = ballsColors[nextColorIndx];
+                    _balls[ballObj].UpdateColor(newColor);
+                }
+                else
+                    Debug.Log("index out of range"); 
+                break;
+
+            case BonusUpgradeType.Scale:
+                if (!_balls[ballObj].IsBig)
+                {
+                    _balls[ballObj].UpdateScaleSize(ballScaleSizes[1], tailWidth[1]);
+                }
+                else
+                    Debug.Log("Ball already big...");
+                break;
+
+            case BonusUpgradeType.BonusBall:
+                GameObject newBall = Instantiate(ballObj, ballObj.transform.position, Quaternion.identity);
+                Ball ballScript = newBall.GetComponent<Ball>();
+                _balls.Add(newBall, ballScript);
+                ThrowBall(ballScript, Quaternion.Euler(0, 0, 110), impulseForce: 4f);
+                break;
+
+            default: Debug.Log("Something go wrong...");
+                break;
+        }
     }
-
-
+     
+    public Ball this[GameObject ballObj]
+    {
+        get
+        {
+            if (_balls.ContainsKey(ballObj))
+            {
+                return _balls[ballObj];
+            }
+            else
+            {
+                Debug.LogError("Key doesn't exist!");
+                return null;
+            }
+        }
+    }
 }
