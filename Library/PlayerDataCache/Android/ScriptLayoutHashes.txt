@@ -4,7 +4,7 @@ D:/MyUnityProjects/JumpBalls/Builds/JumpBulls.apk
 SceneListBegin?
 Assets/Scenes/Game.unity
 SceneListEnd?
-71075043f91d5199f4dcafa59b741269 Assembly-CSharp.dll:.Ball
+220862ac94a2b5ce0f35f4c1b2ccc657 Assembly-CSharp.dll:.Ball
 984dcc0ba3707b7691fbdca8ff508d28 Unity.TextMeshPro.dll:TMPro.TMP_SelectionCaret
 01aa15e337e3a9c62f15153dfac6d589 Unity.TextMeshPro.dll:TMPro.TMP_Dropdown
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationPlayableAsset
@@ -114,7 +114,7 @@ ad9173d3a69d99153f38ed4b62226129 UnityEngine.Networking.dll:UnityEngine.Networki
 9b895dcabbc1faf095c000c32d471fd0 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformChild
 5887ef1bc706b22b773d253fd443ceef UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformVisualizer
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
-5cb9d47f678cff377a799bd213a10014 Assembly-CSharp.dll:.BallsManager
+a71ec474f0a96364f3e11f18d36cee42 Assembly-CSharp.dll:.BallsManager
 afc5b93a7b192de2dcb3832fe35a5c7e Assembly-CSharp.dll:.PlayerController
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.CheckTrigger
 303ad70ce203ad874efe2965d0fbcff9 Unity.Analytics.Tracker.dll:UnityEngine.Analytics.AnalyticsEventTracker

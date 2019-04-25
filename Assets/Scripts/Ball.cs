@@ -14,15 +14,8 @@ public enum BallLayer
 
 public class Ball : MonoBehaviour
 {
-    public PhysicsMaterial2D bouncingMat;
-    public PhysicsMaterial2D solidMat;
-
-    public Color[] startColors;
-    public Vector3[] scaleSizes;
-    public float[] tailWidth;
-
-    public bool InGame { get; set; } = true;
-    public int Points = 1;
+    [SerializeField] private PhysicsMaterial2D bouncingMat;
+    [SerializeField] private PhysicsMaterial2D solidMat;
 
     private Collider2D _collider2D;
     private Rigidbody2D _rb2D;
@@ -38,27 +31,30 @@ public class Ball : MonoBehaviour
 
         SetColliderMaterial(BallMaterial.Standard);
         SetRigidbodyType(RigidbodyType2D.Dynamic);
-
-        SetupRandomScale();
-        SetupRandomColor();
-        ActiveTrail(false);
+        ActiveTrail(false); 
     } 
 
-    private void SetupRandomColor()
+    public void UpdateColor(Color color)
     {
-        int index = Random.Range(0, startColors.Length); 
-        _sprite.color = startColors[index]; 
+        Color = color;
+
+        Points = IsBig ? Points + 2 : Points + 1;
     }
 
-    private void SetupRandomScale()
+    public void UpdateScaleSize(Vector3 newScale, float tailWidth)
     {
-        int index = Random.Range(0, scaleSizes.Length);
-        transform.localScale = scaleSizes[index];
+        if (IsBig)
+        {
+            return;
+        }
+        ScaleSize = newScale;
+        TailWidth = tailWidth;
 
-        _trail.startWidth = tailWidth[index];
-        _trail.endWidth = 0; 
+        IsBig = true;
+
+        Points = Points + 2;
     }
-
+     
     private void ActiveTrail(bool value)
     {
         _trail.enabled = value;
@@ -136,9 +132,10 @@ public class Ball : MonoBehaviour
             SetColliderMaterial(BallMaterial.Standard); 
         }
         else if (other.tag == "Ground")
-        {
+        { 
             SetColliderMaterial(BallMaterial.Standard);
             SetLayer(BallLayer.Solid);
+            ActiveTrail(false);
 
             InGame = false;
         }
@@ -146,9 +143,33 @@ public class Ball : MonoBehaviour
 
     public Color Color
     {
-        get
+        get { return _sprite.color; }
+        set
         {
-            return _sprite.color;
+            _sprite.color = value;
+            _trail.startColor = value;
         }
     } 
+
+    public Vector3 ScaleSize
+    {
+        get { return transform.localScale; }
+        set
+        {
+            transform.localScale = value;
+        }
+    }
+    public float TailWidth
+    {
+        get { return _trail.startWidth; }
+        set
+        {
+            _trail.startWidth = value;
+            _trail.endWidth = 0;
+        }
+    }
+     
+    public bool InGame { get; set; } = true;
+    public int Points { get; set; } = 1;
+    public bool IsBig { get; set; } = false; 
 }

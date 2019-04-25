@@ -1,8 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-//Сейчас мячи просто передаются в инспекторе, в будущем менеджер должен создвать из сам
+public enum BonusUpgradeType
+{
+    Color, Scale, BonusBall
+}
 
 public class BallsManager : MonoBehaviour
 {
@@ -14,6 +19,10 @@ public class BallsManager : MonoBehaviour
     [Header("Balls_Settings")]
     public Transform ballsSpawnPosition;
     public int countBalls;
+    public Color[] ballsColors;
+    public Vector3[] ballScaleSizes;
+    public float[] tailWidth; 
+
     
     [Header("Corridors_Settings")]
     public float speedDownCorridor;
@@ -28,7 +37,7 @@ public class BallsManager : MonoBehaviour
     public float flyDirection_to;
 
     private Dictionary<GameObject, Ball> _balls;
-    private Ball _ballToThrow;
+    private Ball _ballToThrow; 
      
     private CorridorsConductor _corridorsConductor;
 
@@ -47,9 +56,9 @@ public class BallsManager : MonoBehaviour
     private void Start()
     {
         _balls = new Dictionary<GameObject, Ball>();
-
+         
         InstantiateBalls(); 
-    }
+    } 
 
     private void InstantiateBalls()
     {
@@ -143,14 +152,11 @@ public class BallsManager : MonoBehaviour
             indexOfPoint++;
         }
 
-        ThrowBallToPile(ball);
+        ThrowBall(ball, Quaternion.Euler(0, 0, 60), impulseForce: 5f);
     }
 
-    private void ThrowBallToPile(Ball ball)
-    {
-        Quaternion direction = Quaternion.Euler(0, 0, 60); 
-        float impulseForce = 5f; 
-         
+    private void ThrowBall(Ball ball, Quaternion direction, float impulseForce)
+    {  
         ball.Fly(direction, impulseForce, BallMaterial.Standard, BallLayer.Solid, false);  
     }
 
@@ -216,6 +222,46 @@ public class BallsManager : MonoBehaviour
         return Random.Range(flyForce_MIN, flyForce_MAX);
     } 
 
+    /// <summary>
+    /// CHECK!!@!
+    /// </summary>
+    /// <param name="ballObj"></param>
+    public void UpdateBall(GameObject ballObj, BonusUpgradeType ballUpgradeType)
+    {
+        switch (ballUpgradeType)
+        {
+            case BonusUpgradeType.Color:
+                int nextColorIndx = Array.IndexOf(ballsColors, _balls[ballObj].Color) + 1;
+                if (ballsColors.Length < nextColorIndx)
+                { 
+                    Color newColor = ballsColors[nextColorIndx];
+                    _balls[ballObj].UpdateColor(newColor);
+                }
+                else
+                    Debug.Log("index out of range"); 
+                break;
+
+            case BonusUpgradeType.Scale:
+                if (!_balls[ballObj].IsBig)
+                {
+                    _balls[ballObj].UpdateScaleSize(ballScaleSizes[1], tailWidth[1]);
+                }
+                else
+                    Debug.Log("Ball already big...");
+                break;
+
+            case BonusUpgradeType.BonusBall:
+                GameObject newBall = Instantiate(ballObj, ballObj.transform.position, Quaternion.identity);
+                Ball ballScript = newBall.GetComponent<Ball>();
+                _balls.Add(newBall, ballScript);
+                ThrowBall(ballScript, Quaternion.Euler(0, 0, 110), impulseForce: 4f);
+                break;
+
+            default: Debug.Log("Something go wrong...");
+                break;
+        }
+    }
+     
     public Ball this[GameObject ballObj]
     {
         get

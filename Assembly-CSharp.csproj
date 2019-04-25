@@ -65,12 +65,14 @@
     <Compile Include="Assets\_Check\CompleteCameraController.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\BallsManager.cs" />
+    <Compile Include="Assets\Scripts\BonusScript.cs" />
     <Compile Include="Assets\Scripts\CameraScript.cs" />
     <Compile Include="Assets\Scripts\CollisionEffect.cs" />
     <Compile Include="Assets\Scripts\CorridorsConductor.cs" />
+    <Compile Include="Assets\Scripts\FPSDisplayScript.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Scripts\ObjectTransformMover.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\UpdateScore.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>D:/MyUnityProjects/JumpBalls/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>

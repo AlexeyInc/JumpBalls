@@ -8,6 +8,9 @@ public class GameManager : MonoBehaviour
 
     public Text scoreText;
 
+    public Transform bonusSpawn;
+    public GameObject[] bonuses;
+
     string _defaultPlayerName = "Player_Alex";
     int _score;
 
@@ -17,6 +20,8 @@ public class GameManager : MonoBehaviour
         { 
             Instance = this;
         }
+
+        PlayerPrefs.SetInt(_defaultPlayerName, 0);
     }
 
     void Start()
@@ -24,6 +29,7 @@ public class GameManager : MonoBehaviour
         SetupScore();
 
         StartCoroutine(GameLoop());
+        StartCoroutine(BonusesInitialization());
     } 
 
     private void SetupScore()
@@ -32,7 +38,7 @@ public class GameManager : MonoBehaviour
         scoreText.text = _score.ToString();
     }
 
-    IEnumerator GameLoop()
+    private IEnumerator GameLoop()
     {
         while (true)
         {
@@ -42,6 +48,19 @@ public class GameManager : MonoBehaviour
 
             yield return new WaitForSeconds(1f);
         } 
+    }
+
+    private IEnumerator BonusesInitialization()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+
+            //int bonusIndx = Random.Range(0, bonuses.Length);
+            Instantiate(bonuses[0], bonusSpawn, true);
+
+            yield return new WaitForSeconds(10f);
+        }
     }
 
     public void Pause()
