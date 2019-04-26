@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -95,11 +96,14 @@ public class CorridorsConductor : MonoBehaviour
         _occupiedPoints[type][pointIndex] = value;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (true)
+    public void ClearAllOccupidPoints()
+    { 
+        foreach (var corrType in _occupiedPoints.Keys)
         {
-
+            for (int i = 0; i < _occupiedPoints[corrType].Count; i++)
+            {
+                SetOccupiedPointInPath(i, false, corrType);
+            }
         }
     }
 }

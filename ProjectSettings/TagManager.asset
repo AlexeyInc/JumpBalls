@@ -10,6 +10,7 @@ TagManager:
   - Corridor_UP
   - BallCatcher
   - Ground
+  - GameZone
   layers:
   - Default
   - TransparentFX

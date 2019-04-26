@@ -60,7 +60,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Check\CheckInit.cs" />
     <Compile Include="Assets\_Check\CheckMoving.cs" />
+    <Compile Include="Assets\_Check\CheckRigidbody.cs" />
     <Compile Include="Assets\_Check\CheckTrigger.cs" />
     <Compile Include="Assets\_Check\CompleteCameraController.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="Assets\Scripts\CorridorsConductor.cs" />
     <Compile Include="Assets\Scripts\FPSDisplayScript.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\ObjectDesroyer.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\UpdateScore.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
