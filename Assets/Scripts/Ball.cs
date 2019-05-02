@@ -31,7 +31,7 @@ public class Ball : MonoBehaviour
     }
 
     private void Start()
-    { 
+    {  
         SetColliderMaterial(BallMaterial.Standard);
         SetRigidbodyType(RigidbodyType2D.Dynamic);
         ActiveTrail(false); 
@@ -121,14 +121,14 @@ public class Ball : MonoBehaviour
             SetRigidbodyType(RigidbodyType2D.Static);
             ActiveTrail(false);
 
-            BallsManager.Instance.GoCorridorDown(this);
+            GameManager.Instance.BallsManager.GoCorridorDown(this);
         }
         else if (other.tag == "Corridor_UP")
         {
             SetRigidbodyType(RigidbodyType2D.Static);
-            ActiveTrail(false); 
+            ActiveTrail(false);
 
-            BallsManager.Instance.GoCorridorUp(this);
+            GameManager.Instance.BallsManager.GoCorridorUp(this);
         }
         else if (other.tag == "BallCatcher")
         {
@@ -142,13 +142,13 @@ public class Ball : MonoBehaviour
 
             InGame = false;
 
-            BallsManager.Instance.BallGone();
+            GameManager.Instance.BallsManager.BallGone();
         }
         else if (other.tag == "GameZone")
         { 
             InGame = false;
 
-            BallsManager.Instance.BallGone();
+            GameManager.Instance.BallsManager.BallGone();
 
             Destroy(this.gameObject, 1f);
         }
@@ -165,8 +165,7 @@ public class Ball : MonoBehaviour
                 new GradientColorKey[] { new GradientColorKey(value, 0.0f), new GradientColorKey(Color.white, 1.0f) },
                 new GradientAlphaKey[] { new GradientAlphaKey(0.5f, 0.0f), new GradientAlphaKey(0.01f, 1.0f) }
             );
-            //gradient.alphaKeys = new GradientAlphaKey[] { new GradientAlphaKey(100, 0) };
-            //gradient.colorKeys = new GradientColorKey[] { new GradientColorKey(value, 0) };
+             
             _trail.colorGradient = gradient;
         }
     } 

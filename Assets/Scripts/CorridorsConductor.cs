@@ -10,32 +10,20 @@ public enum CorridorType
 }
 
 public class CorridorsConductor : MonoBehaviour
-{
-    public static CorridorsConductor Instance;
-
+{ 
     [SerializeField] private GameObject downPointsContainer;
     [SerializeField] private GameObject upPointsContainer;
 
     Dictionary<CorridorType, Vector3[]> _positionsOfCorridorPoints;
     Dictionary<CorridorType,Dictionary<int, bool>> _occupiedPoints; 
-     
-    private void Awake()
-    {
-        if (Instance == null)
-        { 
-            Instance = this;
-        }
-    }
-
+       
     private void Start()
     {
         _positionsOfCorridorPoints = new Dictionary<CorridorType, Vector3[]>();
         _occupiedPoints = new Dictionary<CorridorType, Dictionary<int, bool>>();
 
         InitCorridorPath(downPointsContainer, CorridorType.Down);
-        InitCorridorPath(upPointsContainer, CorridorType.Up);
-
-        BallsManager.Instance.Initialize(this);
+        InitCorridorPath(upPointsContainer, CorridorType.Up); 
     }
      
     private void InitCorridorPath(GameObject pathContainer, CorridorType corridorType)
