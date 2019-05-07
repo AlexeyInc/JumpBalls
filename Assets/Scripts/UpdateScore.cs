@@ -11,8 +11,8 @@ public class UpdateScore : MonoBehaviour
     {
         if (other.tag == "Ball")
         {
-            Color color = BallsManager.Instance[other.gameObject].Color;
-            int addPoints = BallsManager.Instance[other.gameObject].Points;
+            Color color = GameManager.Instance.BallsManager[other.gameObject].Color;
+            int addPoints = GameManager.Instance.BallsManager[other.gameObject].Points;
 
             GameManager.Instance.UpdateScore(addPoints);
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,32 +10,20 @@ public enum CorridorType
 }
 
 public class CorridorsConductor : MonoBehaviour
-{
-    public static CorridorsConductor Instance;
-
+{ 
     [SerializeField] private GameObject downPointsContainer;
     [SerializeField] private GameObject upPointsContainer;
 
     Dictionary<CorridorType, Vector3[]> _positionsOfCorridorPoints;
     Dictionary<CorridorType,Dictionary<int, bool>> _occupiedPoints; 
-     
-    private void Awake()
-    {
-        if (Instance == null)
-        { 
-            Instance = this;
-        }
-    }
-
+       
     private void Start()
     {
         _positionsOfCorridorPoints = new Dictionary<CorridorType, Vector3[]>();
         _occupiedPoints = new Dictionary<CorridorType, Dictionary<int, bool>>();
 
         InitCorridorPath(downPointsContainer, CorridorType.Down);
-        InitCorridorPath(upPointsContainer, CorridorType.Up);
-
-        BallsManager.Instance.Initialize(this);
+        InitCorridorPath(upPointsContainer, CorridorType.Up); 
     }
      
     private void InitCorridorPath(GameObject pathContainer, CorridorType corridorType)
@@ -95,11 +84,14 @@ public class CorridorsConductor : MonoBehaviour
         _occupiedPoints[type][pointIndex] = value;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (true)
+    public void ClearAllOccupidPoints()
+    { 
+        foreach (var corrType in _occupiedPoints.Keys)
         {
-
+            for (int i = 0; i < _occupiedPoints[corrType].Count; i++)
+            {
+                SetOccupiedPointInPath(i, false, corrType);
+            }
         }
     }
 }
