@@ -1,16 +1,26 @@
 ﻿using UnityEngine;
 
 public class GameView : MonoBehaviour
-{
-    public GameObject PlayerPrefab;
+{ 
     public BallsManager BallsManager;
-    public CorridorsConductor CorridorsConductor; 
+    public BonusManager BonusManager;
+
+    public GameObject PlayerPrefab;
+    public CorridorsConductor CorridorsConductor;
+
+    public LeaderBoard LeaderBoard;
+    public ExplosionBonus ExplosionBonus; 
 
     private void Start()
     {
-        Instantiate(PlayerPrefab);
-        PlayerController playerController = PlayerPrefab.GetComponent<PlayerController>();
+        GameObject player = Instantiate(PlayerPrefab);
+        PlayerController PlayerController = player.GetComponent<PlayerController>();
 
-        GameManager.Instance.Init(BallsManager, CorridorsConductor, playerController);
+        GameManager.Instance.Init(BallsManager, 
+                                  CorridorsConductor, 
+                                  BonusManager,
+                                  PlayerController, 
+                                  LeaderBoard, 
+                                  ExplosionBonus);
     } 
 }

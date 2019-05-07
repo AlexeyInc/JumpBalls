@@ -39,16 +39,23 @@ public class BallsManager : MonoBehaviour
     private float _curImpulseForse;
     private Quaternion _curDirection;
     private int _countBallsToThrow;
-     
+    private float _speedDownIncr = 2;
+
+    private bool gameStart = false;
+
+    private List<Rigidbody2D> _ballsOnGround;
+
     private void Start()
     {
-        _balls = new Dictionary<GameObject, Ball>();
-         
-        InstantiateBalls(); 
+        _ballsOnGround = new List<Rigidbody2D>();
+
+        SetupBalls();
     } 
 
-    private void InstantiateBalls()
+    private void SetupBalls()
     {
+        _balls = new Dictionary<GameObject, Ball>();
+
         float offsetX = 0.25f;
         float tempOffsetX = 0;
         float offsetY = 0.25f;
@@ -69,8 +76,8 @@ public class BallsManager : MonoBehaviour
                 tempOffsetX = 0;
                 tempOffsetY += offsetY;
             }
-        }
-    }
+        } 
+    } 
 
     public void Restart()
     {
@@ -82,8 +89,9 @@ public class BallsManager : MonoBehaviour
         StopAllCoroutines();
 
         _corridorsConductor.ClearAllOccupidPoints();
+        gameStart = false; 
 
-        InstantiateBalls();
+        SetupBalls(); 
     }
 
     public void Initialize(CorridorsConductor corridorsConductor)
@@ -117,8 +125,9 @@ public class BallsManager : MonoBehaviour
              
             Vector3 targetPoint = _corridorsConductor.GetPointPosition(indexOfPoint, corridorType);  
             while (ball.transform.position != targetPoint)
-            {
-                ball.transform.position = Vector3.MoveTowards(ball.transform.position, targetPoint, speedDownCorridor * Time.smoothDeltaTime);
+            { 
+                ball.transform.position = gameStart ? Vector3.MoveTowards(ball.transform.position, targetPoint, (speedDownCorridor/2) * Time.smoothDeltaTime) : 
+                                                        Vector3.MoveTowards(ball.transform.position, targetPoint, speedDownCorridor * Time.smoothDeltaTime);
                 yield return new WaitForEndOfFrame(); 
             }
 
@@ -157,12 +166,12 @@ public class BallsManager : MonoBehaviour
     }
 
     private void ThrowBall(Ball ball, Quaternion direction, float impulseForce)
-    { 
+    {
         ball.Fly(direction, impulseForce, BallMaterial.Standard, BallLayer.Solid, false);  
     }
 
     public void ThrowBalls(int count)
-    {
+    {  
         _countBallsToThrow = count;
 
         _curDirection = GetDirection();
@@ -180,6 +189,10 @@ public class BallsManager : MonoBehaviour
                 while (_ballToThrow == null)
                 {
                     yield return new WaitForSeconds(0.15f);
+                }
+                if (!gameStart)
+                {
+                    gameStart = true;
                 }
             }
             else
@@ -223,13 +236,18 @@ public class BallsManager : MonoBehaviour
         return Random.Range(flyForce_MIN, flyForce_MAX); ;//
     } 
     
-    public void BallGone()
+    public void BallGone(Ball ball)
+    {  
+        Rigidbody2D ballRigidbody = ball.gameObject.GetComponent<Rigidbody2D>();
+        _ballsOnGround.Add(ballRigidbody);
+    }
+
+    public void CheckOnGameOver()
     {
         int ballsLeft = CountBallsInGame();
 
         if (ballsLeft == 0)
         {
-            Debug.Log("here");
             GameManager.Instance.GameOver();
         }
         else
@@ -277,6 +295,14 @@ public class BallsManager : MonoBehaviour
         Ball ballScript = newBall.GetComponent<Ball>();
         _balls.Add(newBall, ballScript);
         ThrowBall(ballScript, Quaternion.Euler(0, 0, -40), impulseForce: 4.5f);
+    }
+
+    public List<Rigidbody2D> BallsOnGround
+    {
+        get
+        {
+            return _ballsOnGround;
+        }
     }
      
     public Ball this[GameObject ballObj]

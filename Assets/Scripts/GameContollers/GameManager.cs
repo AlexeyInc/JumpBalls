@@ -1,4 +1,6 @@
-﻿using System.Collections; 
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,17 +11,16 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverPanel;
     public Text scoreText;
     public Text bestScore;
-
-    public GameObject[] bonuses;
-    public Transform bonusSpawnPositions; 
-    //private Vector3 _spawnPositions; //finish
-
-    private string _defaultPlayerName = "Player1";
+     
+    private string _lastNameKey = "PlayerNickname"; 
     private string _bestScoreName = "BestScore";
     private int _score;
 
     private BallsManager _ballsManager;
+    private BonusManager _bonusManager;
     private PlayerController _playerController;
+    private LeaderBoard _leaderBoard;
+    private ExplosionBonus _explosionBonus;
 
     private void Awake()
     {
@@ -30,17 +31,20 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start()
-    {
-        PlayerPrefs.SetInt(_defaultPlayerName, 0);
+    {  
         bestScore.text = "BEST: " + PlayerPrefs.GetInt(_bestScoreName);
     } 
 
-    public void Init(BallsManager ballsManager, CorridorsConductor corridorsConductor, PlayerController playerController)
+    public void Init(BallsManager ballsManager, CorridorsConductor corridorsConductor, BonusManager bonusManager, PlayerController playerController, LeaderBoard leaderBoard, ExplosionBonus explosionBonus)
     {
         _ballsManager = ballsManager;
         _ballsManager.Initialize(corridorsConductor);
 
+        _bonusManager = bonusManager;
         _playerController = playerController;
+
+        _leaderBoard = leaderBoard;
+        _explosionBonus = explosionBonus;
     }
 
     private void SetupScore(int score)
@@ -53,9 +57,11 @@ public class GameManager : MonoBehaviour
     {
         SetupScore(0);
 
-        StartCoroutine(GameLoop());
-        StartCoroutine(BonusesInitialization());
-    } 
+        _leaderBoard.LoadScoreData(); 
+
+        StartCoroutine(GameLoop()); 
+        StartCoroutine(_bonusManager.BonusesInitialization()); 
+    }
 
     private IEnumerator GameLoop()
     {
@@ -63,24 +69,10 @@ public class GameManager : MonoBehaviour
         {
             yield return new WaitForSeconds(1);
 
-            _ballsManager.ThrowBalls(Random.Range(1, 5));
+            _ballsManager.ThrowBalls(2);//Random.Range(1, 5)
 
-            yield return new WaitForSeconds(Random.Range(0.25f, 3f));
+            yield return new WaitForSeconds(1);//Random.Range(0.25f, 3f)
         } 
-    }
-
-    private IEnumerator BonusesInitialization()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(1f);
-
-            int bonusIndx = Random.Range(0, bonuses.Length);
-            int spawnPosIndx = Random.Range(0, bonusSpawnPositions.Length);
-            Instantiate(bonuses[bonusIndx], bonusSpawnPositions[spawnPosIndx], false);
-
-            yield return new WaitForSeconds(Random.Range(5,9));
-        }
     }
 
     public void Pause()
@@ -97,6 +89,10 @@ public class GameManager : MonoBehaviour
     {
         _ballsManager.Restart();
         _playerController.Restart();
+        _bonusManager.Restart();
+
+        _leaderBoard.AddScore(_score); 
+        _leaderBoard.LoadScoreData();
 
         SetupScore(0);
 
@@ -105,7 +101,14 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     { 
+        _leaderBoard.AddScore(_score);
+         
         gameOverPanel.SetActive(true);
+    }
+
+    public void OpenLeaderBoard()
+    { 
+        _leaderBoard.InitLeaderBoard();
     }
 
     public void UpdateScore(int value)
@@ -113,7 +116,7 @@ public class GameManager : MonoBehaviour
         _score += value;
         scoreText.text = _score.ToString();
 
-        PlayerPrefs.SetInt(_defaultPlayerName, _score);
+        PlayerPrefs.SetInt(PlayerNickname, _score);
 
         if (_score > PlayerPrefs.GetInt(_bestScoreName))
         {
@@ -121,40 +124,45 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt(_bestScoreName, _score);
         }
     }
-     
-    public void SetupBonus(GameObject ballObj, BonusUpgradeType ballUpgradeType)
+
+    public string PlayerNickname
     {
-        switch (ballUpgradeType)
+        get
         {
-            case BonusUpgradeType.Level:
-                _ballsManager.UpgrateBallLevel(ballObj);
-                break;
-
-            case BonusUpgradeType.BallSize:
-                _ballsManager.UpgrateBallSize(ballObj);
-                break;
-
-            case BonusUpgradeType.ExtraBall:
-                _ballsManager.CreateExtraBall(ballObj);
-                break;
-
-            case BonusUpgradeType.PlatformWidth:
-                _playerController.IncreasePlatformWidth();
-                break;
-
-            default:
-                Debug.Log("Something go wrong...");
-                break;
+            if (PlayerPrefs.GetString(_lastNameKey) == "")
+            {
+                PlayerPrefs.SetString(_lastNameKey, "Player1");
+            } 
+            return PlayerPrefs.GetString(_lastNameKey); 
+        }
+        set
+        {
+            PlayerPrefs.SetString(_lastNameKey, value);
         }
     }
 
+    public void Quit()
+    {
+        Application.Quit();
+    }
+      
     public BallsManager BallsManager
     {
         get { return _ballsManager; }
     }
 
-    //public PlayerController PlayerController
-    //{
-    //    get { return _playerController; }
-    //}
+    public PlayerController PlayerController
+    {
+        get { return _playerController; }
+    }
+
+    public BonusManager BonusManager
+    {
+        get { return _bonusManager; }
+    }
+
+    public ExplosionBonus ExplosionBonus
+    {
+        get { return _explosionBonus; }
+    } 
 } 

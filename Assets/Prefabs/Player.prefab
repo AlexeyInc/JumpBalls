@@ -4832,7 +4832,6 @@ GameObject:
   - component: {fileID: 8086811227434848807}
   - component: {fileID: 8086811227434848805}
   - component: {fileID: 8086811227434848804}
-  - component: {fileID: 356132066656045881}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -4849,7 +4848,7 @@ Transform:
   m_GameObject: {fileID: 8086811227434848806}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -1.125, z: 0}
-  m_LocalScale: {x: 0.2, y: 1, z: 0}
+  m_LocalScale: {x: 1.1, y: 1, z: 0}
   m_Children:
   - {fileID: 8086811226917313218}
   - {fileID: 3679539555745593478}
@@ -4887,26 +4886,9 @@ MonoBehaviour:
   boundary:
     xMin: -2
     xMax: 1
-  speedPC: 17
+  speedPC: 7
   speedPhone: 42
-  offsetScaleVal: 0
+  platformStartScale: {x: 1.2, y: 1, z: 0}
+  platformStartPos: {x: 0, y: -1.125, z: 0}
+  offsetScaleVal: 0.05
   numBallsToDecrease: 28000000230000001e00000019000000140000000f0000000a00000005000000
---- !u!95 &356132066656045881
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8086811227434848806}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d7029f155bf8a764cb8edd088292c939, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0

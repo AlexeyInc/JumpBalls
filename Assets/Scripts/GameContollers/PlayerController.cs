@@ -8,26 +8,27 @@ public class Boundary
 
 public class PlayerController : MonoBehaviour
 {
-    public Boundary boundary;
+    public Boundary boundary; 
     public float speedPC;
     public float speedPhone;
+     
+    public Vector3 platformStartScale;
+    public Vector3 platformStartPos;
+    public float offsetScaleVal; 
+    public int[] numBallsToDecrease; 
 
     private CollisionEffect _collisionEffect;
 
-    public float offsetScaleVal; 
-    public int[] numBallsToDecrease;
-
     private int _indxToDecr;
-    private Vector3 _platformStartScale;
-    private Vector3 _platformStartPos;
 
-    private Vector2 _touchStartPos;
+    private Vector3 _touchStartPos;
     private Vector2 _touchOffset;
 
     private void Start()
     {
-        _collisionEffect = GetComponentInChildren<CollisionEffect>();
-        _platformStartScale = transform.localScale;
+        Debug.Log(Application.persistentDataPath);
+
+        _collisionEffect = GetComponentInChildren<CollisionEffect>(); 
 
         GameManager.Instance.BallsManager.BallCountChanged += DecreaseScaleX;
     }
@@ -37,19 +38,24 @@ public class PlayerController : MonoBehaviour
         if (_indxToDecr <= numBallsToDecrease.Length - 1)
         { 
             if (ballCount <= numBallsToDecrease[_indxToDecr])
-            {
-                transform.localScale = new Vector2(transform.localScale.x - offsetScaleVal, transform.localScale.y);
+            { 
+                transform.localScale -= new Vector3(offsetScaleVal, 0, 0);
                 _indxToDecr++;
             }
         }
     }
+
+    //Vector3 offsetX;
 
     void FixedUpdate()
     {
 #if UNITY_EDITOR
         float moveHorizontal = Input.GetAxis("Horizontal");
 
-        transform.Translate(Vector3.right * moveHorizontal * speedPC * Time.deltaTime);
+        transform.position = new Vector3(transform.position.x + moveHorizontal * speedPC * Time.deltaTime, transform.position.y);
+
+        transform.position = new Vector3(Mathf.Clamp(transform.position.x, boundary.xMin, boundary.xMax),
+                                                 transform.position.y, 0);
 
 #endif
 
@@ -62,46 +68,39 @@ public class PlayerController : MonoBehaviour
             //if (touch.phase == TouchPhase.Began)
             //{
             //    _touchStartPos = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 10));
-            //}
-            //else if (touch.phase == TouchPhase.Moved)
-            //{
-            //    _touchOffset = touch.position - _touchStartPos;
-            //}
-            //else if (touch.phase == TouchPhase.Ended)
-            //{
-            //    _touchOffset = Vector3.zero;
-            //}
 
-
-            //Debug.Log("X: " + _touchOffset.x);
-            //Debug.Log("VAL: " + (_touchOffset.x > 0).ToString());
-
-            //Vector3 target = new Vector3(transform.position.x + _touchOffset.x, _touchOffset.y, 0);
-            //Vector3 moveTo = Vector3.Lerp(transform.position, target, Time.deltaTime * speedPhone);
+            //    offsetX = transform.position - _touchStartPos;
+            //} 
 
             if (touch.phase == TouchPhase.Moved)
             {
-                Vector3 touchedPos = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 10));
-
-                Vector3 moveTo = Vector3.Lerp(transform.position, new Vector3(touchedPos.x, transform.position.y, 0), Time.deltaTime * speedPhone);
+                Vector3 touchingPos = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 10));
+                 
+                Vector3 moveTo = Vector3.Lerp(transform.position, new Vector3(touchingPos.x, transform.position.y, 0), Time.deltaTime * speedPhone);
                 transform.position = new Vector3(Mathf.Clamp(moveTo.x, boundary.xMin, boundary.xMax),
                                                  transform.position.y, 0);
             }
+
+            //if (touch.phase == TouchPhase.Ended)
+            //{ 
+            //    offsetX = Vector3.zero;
+            //}
         }
-#endif
-        Debug.Log("pos - " + transform.position);
+#endif 
     }
 
     public void Restart()
     {
-        transform.position = _platformStartPos;
-        transform.localScale = _platformStartScale; 
+        transform.position = platformStartPos;
+        transform.localScale = platformStartScale;
+
+        _indxToDecr = 0;
     }
 
     public void IncreasePlatformWidth()
-    {
-        transform.localScale = new Vector2(transform.localScale.x + offsetScaleVal, transform.localScale.y);
-    }
+    { 
+        transform.localScale += new Vector3(offsetScaleVal, 0, 0);
+    } 
 
     private void OnCollisionEnter2D(Collision2D other)
     {

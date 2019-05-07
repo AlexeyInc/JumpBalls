@@ -142,13 +142,14 @@ public class Ball : MonoBehaviour
 
             InGame = false;
 
-            GameManager.Instance.BallsManager.BallGone();
+            GameManager.Instance.BallsManager.BallGone(this);
+            GameManager.Instance.BallsManager.CheckOnGameOver();
         }
         else if (other.tag == "GameZone")
         { 
             InGame = false;
 
-            GameManager.Instance.BallsManager.BallGone();
+            GameManager.Instance.BallsManager.CheckOnGameOver();
 
             Destroy(this.gameObject, 1f);
         }

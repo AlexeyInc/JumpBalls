@@ -299,9 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3c588d94ebad514d8466804510f19b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bonusUpgradeType: 2
-  TextAnimation: {fileID: 5897344968407246784, guid: ea1318c6eb1a24249a6e9fc5b95ba46b,
-    type: 3}
+  bonusUpgradeType: 3
   scaleSpeed: 85
 --- !u!1 &7930528764788315920
 GameObject:
