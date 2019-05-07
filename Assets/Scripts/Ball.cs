@@ -13,22 +13,25 @@ public enum BallLayer
 }
 
 public class Ball : MonoBehaviour
-{
+{ 
     [SerializeField] private PhysicsMaterial2D bouncingMat;
-    [SerializeField] private PhysicsMaterial2D solidMat;
+    [SerializeField] private PhysicsMaterial2D solidMat; 
 
     private Collider2D _collider2D;
     private Rigidbody2D _rb2D;
     private SpriteRenderer _sprite;
     private TrailRenderer _trail;
-     
-    private void Start()
-    {
+
+    private void Awake()
+    { 
         _rb2D = GetComponent<Rigidbody2D>();
         _collider2D = GetComponent<Collider2D>();
         _sprite = GetComponentInChildren<SpriteRenderer>();
         _trail = GetComponent<TrailRenderer>();
+    }
 
+    private void Start()
+    {  
         SetColliderMaterial(BallMaterial.Standard);
         SetRigidbodyType(RigidbodyType2D.Dynamic);
         ActiveTrail(false); 
@@ -97,7 +100,7 @@ public class Ball : MonoBehaviour
        
     public void Fly(Quaternion rotation, float impulseForce,
                     BallMaterial ballMaterial, BallLayer ballLayer, bool trail = true)  
-    {
+    { 
         if (_rb2D.bodyType == RigidbodyType2D.Static)
         { 
             SetRigidbodyType(RigidbodyType2D.Dynamic); 
@@ -118,14 +121,14 @@ public class Ball : MonoBehaviour
             SetRigidbodyType(RigidbodyType2D.Static);
             ActiveTrail(false);
 
-            BallsManager.Instance.GoCorridorDown(this);
+            GameManager.Instance.BallsManager.GoCorridorDown(this);
         }
         else if (other.tag == "Corridor_UP")
         {
             SetRigidbodyType(RigidbodyType2D.Static);
-            ActiveTrail(false); 
+            ActiveTrail(false);
 
-            BallsManager.Instance.GoCorridorUp(this);
+            GameManager.Instance.BallsManager.GoCorridorUp(this);
         }
         else if (other.tag == "BallCatcher")
         {
@@ -138,6 +141,17 @@ public class Ball : MonoBehaviour
             ActiveTrail(false);
 
             InGame = false;
+
+            GameManager.Instance.BallsManager.BallGone(this);
+            GameManager.Instance.BallsManager.CheckOnGameOver();
+        }
+        else if (other.tag == "GameZone")
+        { 
+            InGame = false;
+
+            GameManager.Instance.BallsManager.CheckOnGameOver();
+
+            Destroy(this.gameObject, 1f);
         }
     }
 
@@ -147,7 +161,13 @@ public class Ball : MonoBehaviour
         set
         {
             _sprite.color = value;
-            _trail.startColor = value;
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(value, 0.0f), new GradientColorKey(Color.white, 1.0f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(0.5f, 0.0f), new GradientAlphaKey(0.01f, 1.0f) }
+            );
+             
+            _trail.colorGradient = gradient;
         }
     } 
 
