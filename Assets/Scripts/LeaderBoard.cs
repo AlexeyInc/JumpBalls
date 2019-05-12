@@ -15,7 +15,7 @@ public class LeaderBoard : MonoBehaviour
     private List<Score> _scoreList; 
     private ScoreData _scoreData;
 
-    private int _maxCountScores = 10;
+    private int _maxCountScores = 15;
       
     public void LoadScoreData()
     {
@@ -51,9 +51,7 @@ public class LeaderBoard : MonoBehaviour
         if (_scoreList != null)
         {
             ClearOldScores();
-
-            //_scoreList.Sort(,)
-
+             
             for (int i = 0; i < _scoreList.Count && i < _maxCountScores; i++)
             {
                 GameObject score = Instantiate(ScorePrefab, ScoreContainer);

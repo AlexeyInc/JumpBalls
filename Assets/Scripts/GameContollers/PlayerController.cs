@@ -54,8 +54,8 @@ public class PlayerController : MonoBehaviour
 
         transform.position = new Vector3(transform.position.x + moveHorizontal * speedPC * Time.deltaTime, transform.position.y);
 
-        transform.position = new Vector3(Mathf.Clamp(transform.position.x, boundary.xMin, boundary.xMax),
-                                                 transform.position.y, 0);
+        //transform.position = new Vector3(Mathf.Clamp(transform.position.x, boundary.xMin, boundary.xMax),
+        //                                         transform.position.y, 0);
 
 #endif
 
@@ -112,5 +112,7 @@ public class PlayerController : MonoBehaviour
             _collisionEffect.transform.position = other.transform.position; 
             _collisionEffect.ActiveParticle(color);
         }
-    }
+
+        Debug.Log("Добавить логику отталкивания от левой и правой части");
+    }  
 }

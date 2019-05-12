@@ -38,17 +38,14 @@ public class BallsManager : MonoBehaviour
 
     private float _curImpulseForse;
     private Quaternion _curDirection;
-    private int _countBallsToThrow;
-    private float _speedDownIncr = 2;
+    private int _countBallsToThrow; 
 
+    private int _curCountBallsInGame;
     private bool gameStart = false;
-
-    private List<Rigidbody2D> _ballsOnGround;
+    private float _speedDownOffset = 2.2f;
 
     private void Start()
-    {
-        _ballsOnGround = new List<Rigidbody2D>();
-
+    {  
         SetupBalls();
     } 
 
@@ -126,7 +123,7 @@ public class BallsManager : MonoBehaviour
             Vector3 targetPoint = _corridorsConductor.GetPointPosition(indexOfPoint, corridorType);  
             while (ball.transform.position != targetPoint)
             { 
-                ball.transform.position = gameStart ? Vector3.MoveTowards(ball.transform.position, targetPoint, (speedDownCorridor/2) * Time.smoothDeltaTime) : 
+                ball.transform.position = gameStart ? Vector3.MoveTowards(ball.transform.position, targetPoint, (speedDownCorridor - _speedDownOffset) * Time.smoothDeltaTime) : 
                                                         Vector3.MoveTowards(ball.transform.position, targetPoint, speedDownCorridor * Time.smoothDeltaTime);
                 yield return new WaitForEndOfFrame(); 
             }
@@ -184,21 +181,15 @@ public class BallsManager : MonoBehaviour
     {
         while (_countBallsToThrow > 0)
         {
-            if (CountBallsInGame() > 0)  
+            while (_ballToThrow == null)
             {
-                while (_ballToThrow == null)
-                {
-                    yield return new WaitForSeconds(0.15f);
-                }
-                if (!gameStart)
-                {
-                    gameStart = true;
-                }
+                yield return new WaitForSeconds(0.1f);
             }
-            else
+            if (!gameStart)
             {
-                break;
+                gameStart = true;
             }
+
             int lastPointDownCorridor = _corridorsConductor.GetPathLength(CorridorType.Down);
             _corridorsConductor.SetOccupiedPointInPath(lastPointDownCorridor - 1, false, CorridorType.Down);
 
@@ -207,7 +198,7 @@ public class BallsManager : MonoBehaviour
 
             _countBallsToThrow--;
 
-            yield return new WaitForSeconds(0.15f); //make more clear
+            yield return new WaitForSeconds(0.125f);
         }
     }
 
@@ -221,8 +212,14 @@ public class BallsManager : MonoBehaviour
                 counter++;
             }
         } 
-        return counter;
+
+        return counter; 
     } 
+
+    public bool IsEnaughBallsOnGround()
+    {
+        return (countBalls - CountBallsInGame()) > (countBalls / 2);
+    }
      
     private Quaternion GetDirection()
     {
@@ -234,16 +231,15 @@ public class BallsManager : MonoBehaviour
     private float GetImpulseForce()
     {
         return Random.Range(flyForce_MIN, flyForce_MAX); ;//
-    } 
-    
-    public void BallGone(Ball ball)
-    {  
-        Rigidbody2D ballRigidbody = ball.gameObject.GetComponent<Rigidbody2D>();
-        _ballsOnGround.Add(ballRigidbody);
-    }
+    }  
 
-    public void CheckOnGameOver()
+    public void BallOutOfGame(bool OutOfGameZone = false)
     {
+        if (OutOfGameZone)
+        {
+            countBalls--;
+        }
+
         int ballsLeft = CountBallsInGame();
 
         if (ballsLeft == 0)
@@ -251,7 +247,7 @@ public class BallsManager : MonoBehaviour
             GameManager.Instance.GameOver();
         }
         else
-        { 
+        {
             BallCountChanged(ballsLeft);
         }
     }
@@ -295,15 +291,7 @@ public class BallsManager : MonoBehaviour
         Ball ballScript = newBall.GetComponent<Ball>();
         _balls.Add(newBall, ballScript);
         ThrowBall(ballScript, Quaternion.Euler(0, 0, -40), impulseForce: 4.5f);
-    }
-
-    public List<Rigidbody2D> BallsOnGround
-    {
-        get
-        {
-            return _ballsOnGround;
-        }
-    }
+    } 
      
     public Ball this[GameObject ballObj]
     {

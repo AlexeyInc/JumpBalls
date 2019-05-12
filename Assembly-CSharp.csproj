@@ -60,15 +60,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Check\CheckExplosion.cs" />
     <Compile Include="Assets\_Check\CheckInit.cs" />
     <Compile Include="Assets\_Check\CheckMoving.cs" />
     <Compile Include="Assets\_Check\CheckRigidbody.cs" />
     <Compile Include="Assets\_Check\CheckTrigger.cs" />
     <Compile Include="Assets\_Check\CompleteCameraController.cs" />
-    <Compile Include="Assets\CheckExplosion.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\Bonus.cs" />
     <Compile Include="Assets\Scripts\CorridorsConductor.cs" />
+    <Compile Include="Assets\Scripts\ExplosionBonus.cs" />
     <Compile Include="Assets\Scripts\GameContollers\BallsManager.cs" />
     <Compile Include="Assets\Scripts\GameContollers\BonusManager.cs" />
     <Compile Include="Assets\Scripts\GameContollers\GameManager.cs" />
@@ -80,10 +81,9 @@
     <Compile Include="Assets\Scripts\LeaderBoard.cs" />
     <Compile Include="Assets\Scripts\Score.cs" />
     <Compile Include="Assets\Scripts\ScoreData.cs" />
+    <Compile Include="Assets\Scripts\Settings.cs" />
     <Compile Include="Assets\Scripts\UpdateScore.cs" />
-    <Compile Include="Assets\Scripts\Views\ExplosionBonus.cs" />
     <Compile Include="Assets\Scripts\Views\GameView.cs" />
-    <Compile Include="Assets\Settings.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>D:/MyUnityProjects/JumpBalls/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>

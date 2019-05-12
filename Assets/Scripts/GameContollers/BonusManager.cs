@@ -8,16 +8,23 @@ public class BonusManager : MonoBehaviour
 {
     public GameObject bonusContainer;
     public GameObject[] bonuses;
-    public Transform bonusSpawnPositions; 
+    public Transform bonusSpawnPositions;
     public GameObject TextAnimation;
 
+    private List<Bonus> _bonusesList;
     private Dictionary<Vector3, bool> _occupiedPos; 
     private Vector3[] _bonusPos; 
     private Dictionary<BonusUpgradeType, string> _bonusText;
      
     void Start()
     { 
-        _bonusText = new Dictionary<BonusUpgradeType, string>(); 
+        _bonusText = new Dictionary<BonusUpgradeType, string>();
+
+        _bonusesList = new List<Bonus>();
+        for (int i = 0; i < bonuses.Length; i++)
+        {
+            _bonusesList.Add(bonuses[i].GetComponentInChildren<Bonus>());
+        }
 
         Init();
     }
@@ -49,9 +56,14 @@ public class BonusManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1f);
+             
+            int bonusIndx = Random.Range(0, bonuses.Length);
 
-            //make bonuses.Length  only after 20 Gone balls
-            int bonusIndx = Random.Range(0, bonuses.Length - 1);
+            if (!CanExecuteBonus(bonusIndx))
+            {
+                continue;
+            }
+
             int spawnPosIndx;
             do
             {
@@ -59,17 +71,35 @@ public class BonusManager : MonoBehaviour
                 yield return new WaitForEndOfFrame();
 
             } while (_occupiedPos[_bonusPos[spawnPosIndx]]);
-
-            GameObject newBonus = Instantiate(bonuses[5], _bonusPos[spawnPosIndx], Quaternion.identity);//bonusIndx
+             
+            GameObject newBonus = Instantiate(bonuses[bonusIndx].gameObject, _bonusPos[spawnPosIndx], Quaternion.identity);//bonusIndx
             newBonus.transform.parent = bonusContainer.transform;
 
             _occupiedPos[_bonusPos[spawnPosIndx]] = true;
 
-            yield return new WaitForSeconds(Random.Range(4, 9));
+            yield return new WaitForSeconds(5f);//Random.Range(4, 9)
         }
     }
 
-    public void SetupBonus(GameObject ballObj, GameObject bonusObj, BonusUpgradeType ballUpgradeType)
+    private bool CanExecuteBonus(int indx)
+    {
+        if (_bonusesList[indx].bonusUpgradeType == BonusUpgradeType.ExplosionBalls)
+        {
+            if (!GameManager.Instance.BallsManager.IsEnaughBallsOnGround())
+            {
+                Debug.Log("Not enaught");
+                return false;
+            }
+            else
+            {
+                Debug.Log("Enaught");
+                return true;
+            }
+        }
+        return true;
+    }
+
+    public void SetupBonusFor(GameObject ballObj, GameObject bonusObj, BonusUpgradeType ballUpgradeType)
     {
         switch (ballUpgradeType)
         {
@@ -91,8 +121,8 @@ public class BonusManager : MonoBehaviour
                 DestroyByTime(bonusObj, 0f, true);
                 break;
 
-            case BonusUpgradeType.ExplosionBalls:
-                GameManager.Instance.ExplosionBonus.MakeExplosion(GameManager.Instance.BallsManager.BallsOnGround);
+            case BonusUpgradeType.ExplosionBalls: 
+                GameManager.Instance.ExplosionBonus.MakeExplosion();
                 DestroyByTime(bonusObj, 0f, true);
                 break;
 

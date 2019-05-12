@@ -11,10 +11,16 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverPanel;
     public Text scoreText;
     public Text bestScore;
-     
-    private string _lastNameKey = "PlayerNickname"; 
+
+    public Collider2D gameZone;
+
+    private string _lastNameKey = "PlayerNickname";
     private string _bestScoreName = "BestScore";
     private int _score;
+
+    private List<Coroutine> gameCourutines;
+    
+    //сделать корректное окончание игры и меню
 
     private BallsManager _ballsManager;
     private BonusManager _bonusManager;
@@ -25,15 +31,17 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null)
-        { 
+        {
             Instance = this;
-        } 
+        }
     }
 
     private void Start()
-    {  
+    {
+        gameCourutines = new List<Coroutine>();
+
         bestScore.text = "BEST: " + PlayerPrefs.GetInt(_bestScoreName);
-    } 
+    }
 
     public void Init(BallsManager ballsManager, CorridorsConductor corridorsConductor, BonusManager bonusManager, PlayerController playerController, LeaderBoard leaderBoard, ExplosionBonus explosionBonus)
     {
@@ -57,27 +65,41 @@ public class GameManager : MonoBehaviour
     {
         SetupScore(0);
 
-        _leaderBoard.LoadScoreData(); 
+        _leaderBoard.LoadScoreData();
 
-        StartCoroutine(GameLoop()); 
-        StartCoroutine(_bonusManager.BonusesInitialization()); 
+        StartGameProccess();
+        //StopGameProccess();
+    }
+
+    private void StartGameProccess()
+    {
+        gameCourutines.Add(StartCoroutine(GameLoop()));
+        gameCourutines.Add(StartCoroutine(_bonusManager.BonusesInitialization()));
+    }
+
+    private void StopGameProccess()
+    {
+        foreach (var c in gameCourutines)
+        {
+            StopCoroutine(c);
+        } 
     }
 
     private IEnumerator GameLoop()
     {
         while (true)
-        {
+        { 
             yield return new WaitForSeconds(1);
-
+            Debug.Log("here");
             _ballsManager.ThrowBalls(2);//Random.Range(1, 5)
 
-            yield return new WaitForSeconds(1);//Random.Range(0.25f, 3f)
-        } 
+            yield return new WaitForSeconds(2);//Random.Range(0.25f, 3f)
+        }
     }
 
     public void Pause()
     {
-        Time.timeScale = 0;
+        Time.timeScale = 0; 
     }
 
     public void Unpause()
@@ -91,7 +113,7 @@ public class GameManager : MonoBehaviour
         _playerController.Restart();
         _bonusManager.Restart();
 
-        _leaderBoard.AddScore(_score); 
+        _leaderBoard.AddScore(_score);
         _leaderBoard.LoadScoreData();
 
         SetupScore(0);
@@ -100,14 +122,16 @@ public class GameManager : MonoBehaviour
     }
 
     public void GameOver()
-    { 
+    {
+        StopAllCoroutines();
+
         _leaderBoard.AddScore(_score);
-         
+
         gameOverPanel.SetActive(true);
     }
 
     public void OpenLeaderBoard()
-    { 
+    {
         _leaderBoard.InitLeaderBoard();
     }
 
@@ -132,8 +156,8 @@ public class GameManager : MonoBehaviour
             if (PlayerPrefs.GetString(_lastNameKey) == "")
             {
                 PlayerPrefs.SetString(_lastNameKey, "Player1");
-            } 
-            return PlayerPrefs.GetString(_lastNameKey); 
+            }
+            return PlayerPrefs.GetString(_lastNameKey);
         }
         set
         {
@@ -141,10 +165,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ActiveGameLoop(bool isActive)
+    {
+        if (isActive)
+        {
+            StartGameProccess();
+        }
+        else
+        {
+            StopGameProccess();
+        }
+    }
+
     public void Quit()
     {
         Application.Quit();
-    }
+    } 
       
     public BallsManager BallsManager
     {
@@ -164,5 +200,5 @@ public class GameManager : MonoBehaviour
     public ExplosionBonus ExplosionBonus
     {
         get { return _explosionBonus; }
-    } 
+    }  
 } 
