@@ -14,13 +14,13 @@ public enum BallLayer
 
 public class Ball : MonoBehaviour
 { 
-    [SerializeField] private PhysicsMaterial2D bouncingMat;
-    [SerializeField] private PhysicsMaterial2D solidMat; 
+    public PhysicsMaterial2D bouncingMat;
+    public PhysicsMaterial2D solidMat; 
 
     private Collider2D _collider2D;
     private Rigidbody2D _rb2D;
     private SpriteRenderer _sprite;
-    private TrailRenderer _trail;
+    private TrailRenderer _trail; 
 
     private void Awake()
     { 
@@ -140,18 +140,24 @@ public class Ball : MonoBehaviour
             SetLayer(BallLayer.Solid);
             ActiveTrail(false);
 
-            InGame = false;
+            InGame = false; 
 
-            GameManager.Instance.BallsManager.BallGone(this);
-            GameManager.Instance.BallsManager.CheckOnGameOver();
+            GameManager.Instance.BallsManager.BallOutOfGame(); 
         }
-        else if (other.tag == "GameZone")
+        else if (other.tag == "OutOfGameZone")
         { 
             InGame = false;
 
-            GameManager.Instance.BallsManager.CheckOnGameOver();
+            GameManager.Instance.BallsManager.BallOutOfGame(true);  
 
             Destroy(this.gameObject, 1f);
+        }
+        else if(other.tag == "ReturnInGame")
+        {
+            Debug.Log("-> " + GameManager.Instance.BallsManager.CountBallsInGame());
+            InGame = true;
+            SetLayer(BallLayer.Flying); 
+            ActiveTrail(true); 
         }
     }
 

@@ -11,8 +11,8 @@ public enum CorridorType
 
 public class CorridorsConductor : MonoBehaviour
 { 
-    [SerializeField] private GameObject downPointsContainer;
-    [SerializeField] private GameObject upPointsContainer;
+    public GameObject downPointsContainer;
+    public GameObject upPointsContainer;
 
     Dictionary<CorridorType, Vector3[]> _positionsOfCorridorPoints;
     Dictionary<CorridorType,Dictionary<int, bool>> _occupiedPoints; 

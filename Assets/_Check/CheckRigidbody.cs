@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class CheckRigidbody : MonoBehaviour
 {
-    Rigidbody rigidbody;
+    Rigidbody _rigidbody;
     // Start is called before the first frame update
     void Awake()
     {
-        rigidbody = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     public void ChangeMassRigidbody()
     {
-        if (rigidbody == null)
+        if (_rigidbody == null)
         {
             Debug.Log("null rb");
         }
-        rigidbody.mass = 2;
+        _rigidbody.mass = 2;
     }
 }

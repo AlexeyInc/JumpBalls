@@ -34,7 +34,7 @@ public class Bonus : MonoBehaviour
         {
             StartCoroutine(PickUpAnim());
 
-            GameManager.Instance.BonusManager.SetupBonus(other.gameObject, _thisBonusObj, bonusUpgradeType); 
+            GameManager.Instance.BonusManager.SetupBonusFor(other.gameObject, _thisBonusObj, bonusUpgradeType); 
             GameManager.Instance.BonusManager.InitBonusTextAnim(this.transform.position, bonusUpgradeType); 
         }
     }
@@ -43,13 +43,13 @@ public class Bonus : MonoBehaviour
     {
         if (_startSizeDelta == _rectTransform.sizeDelta)
         {
-            Vector2 targetSizeDelta = _startSizeDelta + new Vector2(5, 5);
+            Vector2 targetSizeDelta = _startSizeDelta + new Vector2(6f, 6f);
 
             while (_rectTransform.sizeDelta != targetSizeDelta)
             {
                 _rectTransform.sizeDelta = Vector3.MoveTowards(_rectTransform.sizeDelta, targetSizeDelta, Time.smoothDeltaTime * scaleSpeed);
 
-                yield return new WaitForSeconds(0.02f);
+                yield return new WaitForSeconds(0.0125f);
             }
 
             while (_rectTransform.sizeDelta != _startSizeDelta)
