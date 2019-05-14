@@ -4884,11 +4884,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boundary:
-    xMin: -2
-    xMax: 1
+    xMin: -2.31
+    xMax: 1.07
   speedPC: 7
   speedPhone: 42
-  platformStartScale: {x: 1.2, y: 1, z: 0}
   platformStartPos: {x: 0, y: -1.125, z: 0}
   offsetScaleVal: 0.05
   numBallsToDecrease: 28000000230000001e00000019000000140000000f0000000a00000005000000

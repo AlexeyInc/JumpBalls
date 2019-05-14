@@ -4,22 +4,18 @@ using UnityEngine;
 
 public class ExplosionBonus : MonoBehaviour
 {
-    public GameObject pocket;
-    public Collider2D _returnInGameCollider;
-    public Collider2D _groundCollider;
+    public GameObject pocket; 
     public float explosionPower;
     public float timeFly = 2f;
 
     private Collider2D _playerCollider;
-    private Collider2D[] _pocketColliders;
-    private Collider2D _col;
+    private Collider2D[] _pocketColliders; 
 
     private List<Collider2D> _goThoughColliders;
     private List<Rigidbody2D> _balls;
 
     private void Start()
-    {
-        _col = GetComponent<Collider2D>();
+    { 
         _balls = new List<Rigidbody2D>();
         _pocketColliders = pocket.GetComponents<Collider2D>();
     }
@@ -28,14 +24,12 @@ public class ExplosionBonus : MonoBehaviour
 
     public void MakeExplosion()
     {
-        StartCoroutine(ExplosionProcess());
-    }
-    //check
+        StartCoroutine(ExplosionProcess()); 
+    } 
 
     public IEnumerator ExplosionProcess()
     {
-        GameManager.Instance.ActiveGameLoop(false);
-        SetupCollidersForBallsExplosion(true);
+        GameManager.Instance.ActiveGameLoop(false); 
         //-------------------------------
         DiactiveCollidersForBallsFlight();
 
@@ -62,12 +56,10 @@ public class ExplosionBonus : MonoBehaviour
         }
         _balls.Clear();
         //------------------------------- 
-        ActiveCollidersForBallsFlight();
-        //-------------------------------
-        SetupCollidersForBallsExplosion(false);
+        ActiveCollidersAfterBallsFlight(); 
         //--------------------------------
-        yield return new WaitForSeconds(5f);
-        Debug.Log("yield return new WaitForSeconds(5f);");
+        yield return new WaitForSeconds(4.5f);
+         
         GameManager.Instance.ActiveGameLoop(true);
     }
 
@@ -89,7 +81,7 @@ public class ExplosionBonus : MonoBehaviour
         }
     }
 
-    private void ActiveCollidersForBallsFlight()
+    private void ActiveCollidersAfterBallsFlight()
     {
         if (_goThoughColliders != null)
         { 
@@ -99,14 +91,7 @@ public class ExplosionBonus : MonoBehaviour
                 col.enabled = true;
             }
         }
-    }
-
-    private void SetupCollidersForBallsExplosion(bool value)
-    {
-        _col.enabled = value;
-        _returnInGameCollider.enabled = value;
-        _groundCollider.enabled = !value;
-    }
+    } 
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -117,5 +102,5 @@ public class ExplosionBonus : MonoBehaviour
 
             Debug.Log("Count trig balls: " + _balls.Count);
         }
-    } 
+    }
 }

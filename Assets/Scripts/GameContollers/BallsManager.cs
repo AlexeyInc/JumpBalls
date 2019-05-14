@@ -266,12 +266,7 @@ public class BallsManager : MonoBehaviour
 
     public void UpgrateBallSize(GameObject ballObj)
     {
-        if (!_balls[ballObj].IsBig)
-        {
-            _balls[ballObj].UpdateScaleSize(ballScaleSizes[1], tailWidth[1]);
-        }
-        else
-            Debug.Log("Ball already big...");
+        _balls[ballObj].UpdateScaleSize(ballScaleSizes[1], tailWidth[1]); 
     }
 
     public void CreateExtraBall(GameObject ballObj)
@@ -279,7 +274,8 @@ public class BallsManager : MonoBehaviour
         if (ballObj.layer == LayerMask.NameToLayer("FlyingBall"))
         {
             Vector3 ballPosition = ballObj.transform.position;
-            ballObj.layer = LayerMask.NameToLayer("SolidBall");
+            ballObj.layer = LayerMask.NameToLayer("SolidBall"); //for prevent massive balls instantiation
+
             InstantiateExtraBall(ballPosition);
         }
     }
@@ -288,8 +284,9 @@ public class BallsManager : MonoBehaviour
     {
         GameObject newBall = Instantiate(ballPrefab, pos, Quaternion.identity);
         newBall.transform.parent = ballsContainer; 
-        Ball ballScript = newBall.GetComponent<Ball>();
-        _balls.Add(newBall, ballScript);
+        Ball ballScript = newBall.GetComponent<Ball>(); 
+        _balls.Add(newBall, ballScript); 
+
         ThrowBall(ballScript, Quaternion.Euler(0, 0, -40), impulseForce: 4.5f);
     } 
      

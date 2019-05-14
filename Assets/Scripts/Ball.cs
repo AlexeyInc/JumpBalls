@@ -48,6 +48,7 @@ public class Ball : MonoBehaviour
     {
         if (IsBig)
         {
+            Debug.Log("Ball already big...");
             return;
         }
         ScaleSize = newScale;
@@ -133,32 +134,33 @@ public class Ball : MonoBehaviour
         else if (other.tag == "BallCatcher")
         {
             SetColliderMaterial(BallMaterial.Standard); 
-        }
-        else if (other.tag == "Ground")
-        { 
-            SetColliderMaterial(BallMaterial.Standard);
-            SetLayer(BallLayer.Solid);
-            ActiveTrail(false);
-
-            InGame = false; 
-
-            GameManager.Instance.BallsManager.BallOutOfGame(); 
-        }
+        } 
         else if (other.tag == "OutOfGameZone")
-        { 
-            InGame = false;
-
-            GameManager.Instance.BallsManager.BallOutOfGame(true);  
-
-            Destroy(this.gameObject, 1f);
-        }
-        else if(other.tag == "ReturnInGame")
         {
-            Debug.Log("-> " + GameManager.Instance.BallsManager.CountBallsInGame());
-            InGame = true;
-            SetLayer(BallLayer.Flying); 
-            ActiveTrail(true); 
-        }
+            SetOutOFGameState(); 
+
+            GameManager.Instance.BallsManager.BallOutOfGame(true);   
+            Destroy(this.gameObject, 1f);
+
+            Debug.Log("Ball out of game");
+        } 
+    }
+
+    public void SetOutOFGameState()
+    {
+        SetColliderMaterial(BallMaterial.Standard);
+        SetLayer(BallLayer.Solid);
+        ActiveTrail(false);
+
+        InGame = false;
+    }
+
+    public void SetInGameState()
+    {
+        SetLayer(BallLayer.Flying);
+        ActiveTrail(true);
+         
+        InGame = true;
     }
 
     public Color Color
@@ -198,4 +200,5 @@ public class Ball : MonoBehaviour
     public bool InGame { get; set; } = true;
     public int Points { get; set; } = 1;
     public bool IsBig { get; set; } = false; 
+    public bool ExtraBallBonus { get; set; }
 }

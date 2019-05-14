@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour
     public float speedPC;
     public float speedPhone;
      
-    public Vector3 platformStartScale;
     public Vector3 platformStartPos;
     public float offsetScaleVal; 
     public int[] numBallsToDecrease; 
@@ -21,14 +20,16 @@ public class PlayerController : MonoBehaviour
 
     private int _indxToDecr;
 
+    private Boundary _startBoundary;
     private Vector3 _touchStartPos;
     private Vector2 _touchOffset;
+    private Vector3 _platformStartScale;
 
     private void Start()
-    {
-        Debug.Log(Application.persistentDataPath);
-
-        _collisionEffect = GetComponentInChildren<CollisionEffect>(); 
+    { 
+        _collisionEffect = GetComponentInChildren<CollisionEffect>();
+        _platformStartScale = transform.localScale;
+        _startBoundary = new Boundary() { xMin = boundary.xMin, xMax = boundary.xMax };
 
         GameManager.Instance.BallsManager.BallCountChanged += DecreaseScaleX;
     }
@@ -41,11 +42,25 @@ public class PlayerController : MonoBehaviour
             { 
                 transform.localScale -= new Vector3(offsetScaleVal, 0, 0);
                 _indxToDecr++;
+
+                RefreshBoundary(true);
             }
         }
-    }
+    } 
 
-    //Vector3 offsetX;
+    private void RefreshBoundary(bool increase = false)
+    {
+        if (increase)
+        { 
+            boundary.xMax += 0.02f;
+            boundary.xMin -= 0.02f;
+        }
+        else
+        { 
+            boundary.xMax -= 0.02f;
+            boundary.xMin += 0.02f;
+        }
+    }
 
     void FixedUpdate()
     {
@@ -54,8 +69,8 @@ public class PlayerController : MonoBehaviour
 
         transform.position = new Vector3(transform.position.x + moveHorizontal * speedPC * Time.deltaTime, transform.position.y);
 
-        //transform.position = new Vector3(Mathf.Clamp(transform.position.x, boundary.xMin, boundary.xMax),
-        //                                         transform.position.y, 0);
+        transform.position = new Vector3(Mathf.Clamp(transform.position.x, boundary.xMin, boundary.xMax),
+                                                 transform.position.y, 0);
 
 #endif
 
@@ -92,7 +107,8 @@ public class PlayerController : MonoBehaviour
     public void Restart()
     {
         transform.position = platformStartPos;
-        transform.localScale = platformStartScale;
+        transform.localScale = _platformStartScale;
+        boundary = new Boundary() { xMin = _startBoundary.xMin, xMax = _startBoundary.xMax };
 
         _indxToDecr = 0;
     }
@@ -100,6 +116,7 @@ public class PlayerController : MonoBehaviour
     public void IncreasePlatformWidth()
     { 
         transform.localScale += new Vector3(offsetScaleVal, 0, 0);
+        RefreshBoundary();
     } 
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -111,8 +128,7 @@ public class PlayerController : MonoBehaviour
              
             _collisionEffect.transform.position = other.transform.position; 
             _collisionEffect.ActiveParticle(color);
-        }
+        } 
+    } 
 
-        Debug.Log("Добавить логику отталкивания от левой и правой части");
-    }  
 }
