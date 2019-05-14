@@ -27,16 +27,20 @@ public class Bonus : MonoBehaviour
     }
      
     private void OnTriggerEnter2D(Collider2D other)
-    { 
-        string objLayer = LayerMask.LayerToName(other.gameObject.layer);
-
-        if (objLayer == "FlyingBall")
+    {  
+        if (other.tag == "Ball")
         {
-            StartCoroutine(PickUpAnim());
+            string objLayer = LayerMask.LayerToName(other.gameObject.layer);
 
-            GameManager.Instance.BonusManager.SetupBonusFor(other.gameObject, _thisBonusObj, bonusUpgradeType); 
-            GameManager.Instance.BonusManager.InitBonusTextAnim(this.transform.position, bonusUpgradeType); 
-        }
+            //second condition allowing extra ball catch all bonuses exept "ExtraBall" again, coz extra ball have "SolidBall" Layer
+            if (objLayer == "FlyingBall" || GameManager.Instance.BallsManager[other.gameObject].ExtraBallBonus) 
+            {
+                StartCoroutine(PickUpAnim());
+
+                GameManager.Instance.BonusManager.SetupBonusFor(other.gameObject, _thisBonusObj, bonusUpgradeType);
+                GameManager.Instance.BonusManager.InitBonusTextAnim(this.transform.position, bonusUpgradeType);
+            }
+        } 
     }
 
     private IEnumerator PickUpAnim()

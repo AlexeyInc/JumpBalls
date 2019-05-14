@@ -56,8 +56,8 @@ public class BonusManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1f);
-             
-            int bonusIndx = Random.Range(0, bonuses.Length);
+
+            int bonusIndx = Random.Range(0, bonuses.Length);//
 
             if (!CanExecuteBonus(bonusIndx))
             {
@@ -107,7 +107,7 @@ public class BonusManager : MonoBehaviour
                 GameManager.Instance.BallsManager.UpgrateBallLevel(ballObj);
                 break;
 
-            case BonusUpgradeType.BallSize:
+            case BonusUpgradeType.BallSize: 
                 GameManager.Instance.BallsManager.UpgrateBallSize(ballObj); 
                 DestroyByTime(bonusObj, 0f, true);
                 break;
