@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     private PlayerController _playerController;
     private LeaderBoard _leaderBoard;
     private ExplosionBonus _explosionBonus;
-
+     
     private void Awake()
     {
         if (Instance == null)
@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         gameCourutines = new List<Coroutine>();
-
+        
         bestScore.text = "BEST: " + PlayerPrefs.GetInt(_bestScoreName);
     }
 
@@ -54,9 +54,9 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         SetupScore(0);
+        LeaderBoard.SetupLeaderBoard();
 
-        StartGameProccess();
-        //StopGameProccess();
+        ActiveGameLoop(true);
     }
 
     private void SetupScore(int score)
@@ -77,6 +77,20 @@ public class GameManager : MonoBehaviour
             bestScore.text = "BEST: " + _score;
             PlayerPrefs.SetInt(_bestScoreName, _score);
         }
+    }
+     
+    public void ActiveGameLoop(bool isActive)
+    {
+        if (isActive)
+        {
+            StartGameProccess();
+        }
+        else
+        {
+            StopGameProccess();
+        }
+
+        PlayerController.IsGameActive(isActive);
     }
 
     private void StartGameProccess()
@@ -99,11 +113,11 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         { 
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(1f);
              
             _ballsManager.ThrowBalls(Random.Range(1, 5));//
 
-            yield return new WaitForSeconds(Random.Range(0.25f, 2.5f));//
+            yield return new WaitForSeconds(Random.Range(0, 2f));//
         }
     }
 
@@ -119,24 +133,42 @@ public class GameManager : MonoBehaviour
 
     public void Restart()
     {
+        Unpause();
+
+        ActiveGameLoop(false);
+
         _ballsManager.Restart();
         _playerController.Restart();
         _bonusManager.Restart();
 
-        _leaderBoard.AddScore(_score);
         _leaderBoard.SetupLeaderBoard();
+        _leaderBoard.AddScore(_score);
 
         SetupScore(0);
-        StartGameProccess();
+         
+        ActiveGameLoop(true);
+    }
+
+    public void GoToMainMenu()
+    {
+        Unpause();
+
+        ActiveGameLoop(false);
+
+        _bonusManager.Restart();
+        _ballsManager.Restart();
+        _playerController.Restart();
     }
 
     public void GameOver()
     {
-        StopGameProccess();
+        Pause();
+
+        ActiveGameLoop(false);
 
         _leaderBoard.AddScore(_score);
 
-        gameOverPanel.SetActive(true);
+        gameOverPanel.SetActive(true); 
     } 
      
     public string PlayerNickname
@@ -154,23 +186,11 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetString(_lastNameKey, value);
         }
     }
-
-    public void ActiveGameLoop(bool isActive)
-    {
-        if (isActive)
-        {
-            StartGameProccess();
-        }
-        else
-        {
-            StopGameProccess();
-        }
-    }
-
+     
     public void Quit()
     {
         Application.Quit();
-    } 
+    }  
       
     public BallsManager BallsManager
     {
@@ -191,4 +211,9 @@ public class GameManager : MonoBehaviour
     {
         get { return _explosionBonus; }
     }  
+
+    public LeaderBoard LeaderBoard
+    {
+        get { return _leaderBoard; }
+    }
 } 

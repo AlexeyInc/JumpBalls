@@ -66,6 +66,7 @@
     <Compile Include="Assets\_Check\CheckRigidbody.cs" />
     <Compile Include="Assets\_Check\CheckTrigger.cs" />
     <Compile Include="Assets\_Check\CompleteCameraController.cs" />
+    <Compile Include="Assets\ScreenScaler.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\Bonus.cs" />
     <Compile Include="Assets\Scripts\CorridorsConductor.cs" />

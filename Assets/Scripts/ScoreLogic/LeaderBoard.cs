@@ -16,14 +16,9 @@ public class LeaderBoard : MonoBehaviour
     private ScoreData _scoreData;
 
     private int _maxCountScores = 15;
-
-    private void Start()
-    {
-        SetupLeaderBoard();
-    } 
-
+      
     public void SetupLeaderBoard()
-    { 
+    {
         LoadScoreData();
         InitLeaderBoard();
     }
@@ -39,6 +34,8 @@ public class LeaderBoard : MonoBehaviour
         }
         else
         {
+            _scoreData = new ScoreData();
+        Debug.Log("here");
             _scoreData = new ScoreData();
         }
 

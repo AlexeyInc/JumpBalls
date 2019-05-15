@@ -19,9 +19,7 @@ public class ExplosionBonus : MonoBehaviour
         _balls = new List<Rigidbody2D>();
         _pocketColliders = pocket.GetComponents<Collider2D>();
     }
-
-    //make setup method
-
+     
     public void MakeExplosion()
     {
         StartCoroutine(ExplosionProcess()); 
@@ -99,8 +97,9 @@ public class ExplosionBonus : MonoBehaviour
         {
             Rigidbody2D ballRb2D = other.GetComponent<Rigidbody2D>();
             _balls.Add(ballRb2D);
-
-            Debug.Log("Count trig balls: " + _balls.Count);
+             
+            //Debug.Log("Count ground balls: " + _balls.Count);
+            //Debug.Log("Count balls in game: " + GameManager.Instance.BallsManager.CoutBalls);
         }
     }
 }

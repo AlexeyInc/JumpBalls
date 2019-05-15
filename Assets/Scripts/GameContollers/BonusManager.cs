@@ -72,12 +72,12 @@ public class BonusManager : MonoBehaviour
 
             } while (_occupiedPos[_bonusPos[spawnPosIndx]]);
              
-            GameObject newBonus = Instantiate(bonuses[bonusIndx].gameObject, _bonusPos[spawnPosIndx], Quaternion.identity);//bonusIndx
+            GameObject newBonus = Instantiate(bonuses[bonusIndx].gameObject, _bonusPos[spawnPosIndx], Quaternion.identity);//
             newBonus.transform.parent = bonusContainer.transform;
 
             _occupiedPos[_bonusPos[spawnPosIndx]] = true;
 
-            yield return new WaitForSeconds(5f);//Random.Range(4, 9)
+            yield return new WaitForSeconds(Random.Range(6, 9));//
         }
     }
 
@@ -86,13 +86,11 @@ public class BonusManager : MonoBehaviour
         if (_bonusesList[indx].bonusUpgradeType == BonusUpgradeType.ExplosionBalls)
         {
             if (!GameManager.Instance.BallsManager.IsEnaughBallsOnGround())
-            {
-                Debug.Log("Not enaught");
+            { 
                 return false;
             }
             else
-            {
-                Debug.Log("Enaught");
+            { 
                 return true;
             }
         }

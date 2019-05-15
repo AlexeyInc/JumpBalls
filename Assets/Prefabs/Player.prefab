@@ -4848,7 +4848,7 @@ Transform:
   m_GameObject: {fileID: 8086811227434848806}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -1.125, z: 0}
-  m_LocalScale: {x: 1.1, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0}
   m_Children:
   - {fileID: 8086811226917313218}
   - {fileID: 3679539555745593478}
@@ -4883,11 +4883,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 264bdf5423365fc4f813451c97384773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundary:
-    xMin: -2.31
-    xMax: 1.07
   speedPC: 7
-  speedPhone: 42
+  speedPhone: 55
   platformStartPos: {x: 0, y: -1.125, z: 0}
   offsetScaleVal: 0.05
   numBallsToDecrease: 28000000230000001e00000019000000140000000f0000000a00000005000000

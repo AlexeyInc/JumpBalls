@@ -37,7 +37,7 @@ public class BallsManager : MonoBehaviour
     private CorridorsConductor _corridorsConductor;
 
     private float _curImpulseForse;
-    private Quaternion _curDirection;
+    private Quaternion _curAngle;
     private int _countBallsToThrow; 
 
     private int _curCountBallsInGame;
@@ -171,8 +171,9 @@ public class BallsManager : MonoBehaviour
     {  
         _countBallsToThrow = count;
 
-        _curDirection = GetDirection();
-        _curImpulseForse = GetImpulseForce();
+        bool nearOrFar = Random.Range(0f,1f) >= 0.5f;
+        _curAngle = GetAngle(nearOrFar); 
+        _curImpulseForse = GetImpulseForce(nearOrFar);
 
         StartCoroutine(ThrowCourutine());
     }
@@ -193,7 +194,7 @@ public class BallsManager : MonoBehaviour
             int lastPointDownCorridor = _corridorsConductor.GetPathLength(CorridorType.Down);
             _corridorsConductor.SetOccupiedPointInPath(lastPointDownCorridor - 1, false, CorridorType.Down);
 
-            _ballToThrow.Fly(_curDirection, _curImpulseForse, BallMaterial.Bouncing, BallLayer.Flying);
+            _ballToThrow.Fly(_curAngle, _curImpulseForse, BallMaterial.Bouncing, BallLayer.Flying);
             _ballToThrow = null;
 
             _countBallsToThrow--;
@@ -218,26 +219,44 @@ public class BallsManager : MonoBehaviour
 
     public bool IsEnaughBallsOnGround()
     {
-        return (countBalls - CountBallsInGame()) > (countBalls / 2);
+        return (CoutBalls - CountBallsInGame()) > (CoutBalls / 2);
     }
      
-    private Quaternion GetDirection()
-    {
-        float angleZ = Random.Range(flyDirection_from, flyDirection_to);
-        Quaternion newRotation = Quaternion.Euler(0, 0, angleZ); // -50
-        return newRotation;
+    private Quaternion GetAngle(bool near)
+    { 
+        float angleZ = 0;
+        if (near)
+        {
+            angleZ = Random.Range(flyDirection_from, (flyDirection_from+flyDirection_to) / 2);
+        }
+        else
+        {
+            angleZ = Random.Range((flyDirection_from + flyDirection_to) / 2, flyDirection_to);
+        }
+
+        Quaternion newAngle = Quaternion.Euler(0, 0, angleZ); // -50
+        return newAngle;
     }
 
-    private float GetImpulseForce()
+    private float GetImpulseForce(bool near)
     {
-        return Random.Range(flyForce_MIN, flyForce_MAX); ;//
-    }  
-
-    public void BallOutOfGame(bool OutOfGameZone = false)
-    {
-        if (OutOfGameZone)
+        float force = 0;
+        if (near)
         {
-            countBalls--;
+            force = Random.Range(flyForce_MIN, (flyForce_MIN + flyForce_MAX) / 2);
+        }
+        else
+        {
+            force = Random.Range((flyForce_MIN + flyForce_MAX) / 2, flyForce_MAX);
+        }
+        return force;//
+    }
+
+    public void BallOutOfGame(GameObject ball = null)
+    {
+        if (ball != null)
+        {
+            _balls.Remove(ball);
         }
 
         int ballsLeft = CountBallsInGame();
@@ -282,13 +301,24 @@ public class BallsManager : MonoBehaviour
 
     private void InstantiateExtraBall(Vector3 pos)
     {
-        GameObject newBall = Instantiate(ballPrefab, pos, Quaternion.identity);
-        newBall.transform.parent = ballsContainer; 
+        GameObject newBall = Instantiate(ballPrefab, pos, Quaternion.identity); 
         Ball ballScript = newBall.GetComponent<Ball>(); 
         _balls.Add(newBall, ballScript); 
 
         ThrowBall(ballScript, Quaternion.Euler(0, 0, -40), impulseForce: 4.5f);
     } 
+
+    private void AddNewBall(GameObject ball, Ball ballScript)
+    {
+        ball.transform.parent = ballsContainer;
+
+        _balls.Add(ball, ballScript);
+    }
+
+    public int CoutBalls
+    {
+        get { return _balls.Count; }
+    }
      
     public Ball this[GameObject ballObj]
     {
@@ -300,7 +330,7 @@ public class BallsManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Key doesn't exist!");
+                Debug.LogWarning("Key doesn't exist!");
                 return null;
             }
         }

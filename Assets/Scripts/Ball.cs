@@ -139,8 +139,8 @@ public class Ball : MonoBehaviour
         {
             SetOutOFGameState(); 
 
-            GameManager.Instance.BallsManager.BallOutOfGame(true);   
-            Destroy(this.gameObject, 1f);
+            GameManager.Instance.BallsManager.BallOutOfGame(this.gameObject);   
+            Destroy(this.gameObject);
 
             Debug.Log("Ball out of game");
         } 
