@@ -1,5 +1,9 @@
 # JumpBalls
 
+Classic Arcade game. 
+
+Includes build to Xiaomi Erdmi Note 5 (9:18), ZTE (9:16)
+
 ![ColorBalls gif](https://user-images.githubusercontent.com/29926552/57929825-fcaea700-78bc-11e9-8534-fe91ead9ea8f.gif)
 
 
