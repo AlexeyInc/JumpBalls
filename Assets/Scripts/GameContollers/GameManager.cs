@@ -35,8 +35,10 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         gameCourutines = new List<Coroutine>();
-        
-        bestScore.text = "BEST: " + PlayerPrefs.GetInt(_bestScoreName);
+         
+        LeaderBoard.SetupLeaderBoard();
+          
+        bestScore.text = "BEST: " + LeaderBoard.BestScore;
     }
 
     public void Init(BallsManager ballsManager, CorridorsConductor corridorsConductor, BonusManager bonusManager, PlayerController playerController, LeaderBoard leaderBoard, ExplosionBonus explosionBonus)
@@ -54,7 +56,6 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         SetupScore(0);
-        LeaderBoard.SetupLeaderBoard();
 
         ActiveGameLoop(true);
     }
@@ -115,9 +116,9 @@ public class GameManager : MonoBehaviour
         { 
             yield return new WaitForSeconds(1f);
              
-            _ballsManager.ThrowBalls(Random.Range(1, 5));//
+            _ballsManager.ThrowBalls(Random.Range(1, 4));//
 
-            yield return new WaitForSeconds(Random.Range(0, 2f));//
+            yield return new WaitForSeconds(Random.Range(0, 2.2f));//
         }
     }
 
@@ -155,20 +156,25 @@ public class GameManager : MonoBehaviour
 
         ActiveGameLoop(false);
 
+        _leaderBoard.SetupLeaderBoard();
+        _leaderBoard.AddScore(_score);
+
         _bonusManager.Restart();
         _ballsManager.Restart();
         _playerController.Restart();
+
+        SetupScore(0);
     }
 
     public void GameOver()
-    {
-        Pause();
-
+    { 
+        gameOverPanel.SetActive(true);
+         
         ActiveGameLoop(false);
 
         _leaderBoard.AddScore(_score);
 
-        gameOverPanel.SetActive(true); 
+        Pause();
     } 
      
     public string PlayerNickname

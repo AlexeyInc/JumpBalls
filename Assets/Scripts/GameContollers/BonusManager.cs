@@ -112,6 +112,8 @@ public class BonusManager : MonoBehaviour
 
             case BonusUpgradeType.ExtraBall:
                 GameManager.Instance.BallsManager.CreateExtraBall(ballObj);
+
+                Debug.Log("Balls in game after: " + GameManager.Instance.BallsManager.CoutBalls);
                 break;
 
             case BonusUpgradeType.PlatformWidth:
@@ -148,7 +150,7 @@ public class BonusManager : MonoBehaviour
         int countBonuses = bonusContainer.transform.childCount;
         for (int i = 0; i < countBonuses; i++)
         {
-            DestroyByTime(bonusContainer.transform.GetChild(0).gameObject, 0f, true);
+            DestroyByTime(bonusContainer.transform.GetChild(i).gameObject, 0f, true);
         }
 
         //foreach (var item in _occupiedPos.Keys.ToList())

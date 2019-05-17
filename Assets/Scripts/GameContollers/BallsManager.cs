@@ -64,7 +64,7 @@ public class BallsManager : MonoBehaviour
             tempOffsetX += offsetX;
 
             GameObject newBall = Instantiate(ballPrefab, ballPos, Quaternion.identity);
-            newBall.transform.parent = ballsContainer;
+            newBall.transform.SetParent(ballsContainer);
             Ball ballScript = newBall.GetComponent<Ball>();
             _balls.Add(newBall, ballScript);
 
@@ -203,23 +203,26 @@ public class BallsManager : MonoBehaviour
         }
     }
 
-    public int CountBallsInGame()
+    public int CountBallsInGame
     {
-        int counter = 0;
-        foreach (var ball in _balls)
+        get
         {
-            if (ball.Value.InGame)
+            int counter = 0;
+            foreach (var ball in _balls)
             {
-                counter++;
+                if (ball.Value.InGame)
+                {
+                    counter++;
+                }
             }
-        } 
 
-        return counter; 
+            return counter;
+        } 
     } 
 
     public bool IsEnaughBallsOnGround()
     {
-        return (CoutBalls - CountBallsInGame()) > (CoutBalls / 2);
+        return (CoutBalls - CountBallsInGame) > (CoutBalls / 2);
     }
      
     private Quaternion GetAngle(bool near)
@@ -259,7 +262,7 @@ public class BallsManager : MonoBehaviour
             _balls.Remove(ball);
         }
 
-        int ballsLeft = CountBallsInGame();
+        int ballsLeft = CountBallsInGame;
 
         if (ballsLeft == 0)
         {
@@ -305,13 +308,13 @@ public class BallsManager : MonoBehaviour
         Ball ballScript = newBall.GetComponent<Ball>(); 
         _balls.Add(newBall, ballScript); 
 
-        ThrowBall(ballScript, Quaternion.Euler(0, 0, -40), impulseForce: 4.5f);
+        ThrowBall(ballScript, Quaternion.Euler(0, 0, -40), impulseForce: 5f);
     } 
 
     private void AddNewBall(GameObject ball, Ball ballScript)
     {
-        ball.transform.parent = ballsContainer;
-
+        ball.transform.SetParent(ballsContainer);
+         
         _balls.Add(ball, ballScript);
     }
 

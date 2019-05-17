@@ -137,12 +137,14 @@ public class Ball : MonoBehaviour
         } 
         else if (other.tag == "OutOfGameZone")
         {
-            SetOutOFGameState(); 
+            SetOutOFGameState();
+
+            //Debug.Log("Before ball out of game: " + GameManager.Instance.BallsManager.CoutBalls);
 
             GameManager.Instance.BallsManager.BallOutOfGame(this.gameObject);   
             Destroy(this.gameObject);
-
-            Debug.Log("Ball out of game");
+              
+            Debug.Log("Ball out of game: " + GameManager.Instance.BallsManager.CoutBalls);
         } 
     }
 
@@ -172,7 +174,7 @@ public class Ball : MonoBehaviour
             Gradient gradient = new Gradient();
             gradient.SetKeys(
                 new GradientColorKey[] { new GradientColorKey(value, 0.0f), new GradientColorKey(Color.white, 1.0f) },
-                new GradientAlphaKey[] { new GradientAlphaKey(0.5f, 0.0f), new GradientAlphaKey(0.01f, 1.0f) }
+                new GradientAlphaKey[] { new GradientAlphaKey(0.5f, 0.0f), new GradientAlphaKey(0.01f, 0.9f) }
             );
              
             _trail.colorGradient = gradient;

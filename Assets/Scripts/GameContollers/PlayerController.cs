@@ -36,11 +36,12 @@ public class PlayerController : MonoBehaviour
     private void Start()
     { 
         _collisionEffect = GetComponentInChildren<CollisionEffect>();
-        _platformStartScale = transform.localScale; 
+        _platformStartScale = transform.localScale;
 
         GameManager.Instance.BallsManager.BallCountChanged += DecreaseScaleX;
 
         StartCoroutine(SetGameBoundary());
+        //StartCoroutine(SetStartScale());
     }
 
     public IEnumerator SetGameBoundary()
@@ -51,6 +52,15 @@ public class PlayerController : MonoBehaviour
         _startBoundary = new Boundary(boundary.xMin, boundary.xMax);
         _curBoundary = new Boundary(boundary.xMin, boundary.xMax);
     }
+
+    //public IEnumerator SetStartScale()
+    //{
+    //    yield return new WaitForSeconds(0.5f);
+
+    //    transform.localScale = new Vector3(ScreenScaler.Instance.ScaleX, 1f);
+
+    //    _platformStartScale = transform.localScale;
+    //}
 
     private void DecreaseScaleX(int ballCount)
     {
@@ -82,9 +92,10 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isGameActive)//isGameActive
+        
+        if (isGameActive)
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_WEBGL
             float moveHorizontal = Input.GetAxis("Horizontal");
 
             transform.position = new Vector3(transform.position.x + moveHorizontal * speedPC * Time.deltaTime, transform.position.y);
@@ -94,32 +105,16 @@ public class PlayerController : MonoBehaviour
 
 #endif
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IOS
 
-            if (Input.touchCount > 0)
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
             {
-                Touch touch = Input.GetTouch(0);
+                float xPos = Input.GetTouch(0).deltaPosition.x * speedPhone * Time.smoothDeltaTime;
 
-                //if (touch.phase == TouchPhase.Began)
-                //{
-                //    _touchStartPos = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 10));
+                this.transform.Translate(new Vector2(xPos, 0));
 
-                //    offsetX = transform.position - _touchStartPos;
-                //} 
-
-                if (touch.phase == TouchPhase.Moved)
-                {
-                    Vector3 touchingPos = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, 10));
-
-                    Vector3 moveTo = Vector3.Lerp(transform.position, new Vector3(touchingPos.x, transform.position.y, 0), Time.deltaTime * speedPhone);
-                    transform.position = new Vector3(Mathf.Clamp(moveTo.x, _curBoundary.xMin, _curBoundary.xMax),
-                                                     transform.position.y, 0);
-                }
-
-                //if (touch.phase == TouchPhase.Ended)
-                //{ 
-                //    offsetX = Vector3.zero;
-                //}
+                transform.position = new Vector3(Mathf.Clamp(this.transform.position.x, _curBoundary.xMin, _curBoundary.xMax),
+                                                             transform.position.y, 0); 
             }
 #endif 
         } 

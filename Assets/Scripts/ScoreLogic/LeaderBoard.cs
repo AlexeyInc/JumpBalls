@@ -20,11 +20,10 @@ public class LeaderBoard : MonoBehaviour
     public void SetupLeaderBoard()
     {
         LoadScoreData();
-        InitLeaderBoard();
     }
 
     private void LoadScoreData()
-    {
+    { 
         string filePath = Application.persistentDataPath + scoreDataFileName;
 
         if (File.Exists(filePath))
@@ -34,8 +33,7 @@ public class LeaderBoard : MonoBehaviour
         }
         else
         {
-            _scoreData = new ScoreData();
-        Debug.Log("here");
+            _scoreData = new ScoreData(); 
             _scoreData = new ScoreData();
         }
 
@@ -52,32 +50,6 @@ public class LeaderBoard : MonoBehaviour
 
         string filePath = Application.persistentDataPath + scoreDataFileName;
         File.WriteAllText(filePath, dataAsJson);
-    }
-
-    private void InitLeaderBoard()
-    {
-        if (_scoreList != null)
-        {
-            ClearOldScores();
-             
-            for (int i = 0; i < _scoreList.Count && i < _maxCountScores; i++)
-            {
-                GameObject score = Instantiate(ScorePrefab, ScoreContainer);
-                 
-                Text[] scoreLines = score.GetComponentsInChildren<Text>();
-                scoreLines[0].text = (i + 1).ToString();
-                scoreLines[1].text = _scoreList[i].Nickname;
-                scoreLines[2].text = _scoreList[i].Points.ToString(); 
-            }
-        }
-    }
-
-    private void ClearOldScores()
-    { 
-        for (int i = 0; i < ScoreContainer.childCount; i++)
-        {
-            Destroy(ScoreContainer.GetChild(i).gameObject);
-        }
     }
 
     public void AddScore(int score)
@@ -99,7 +71,9 @@ public class LeaderBoard : MonoBehaviour
                 if (_scoreList[i].Points <= score)
                 {
                     _scoreList.Insert(i, newScore);
-                     
+                    _scoreList.Sort(new ScoreComparer());
+                    _scoreList.Reverse();
+
                     SaveScoreData();
                     return;
                 }
@@ -111,5 +85,41 @@ public class LeaderBoard : MonoBehaviour
                 SaveScoreData();
             }
         }
+
+        InitLeaderBoard();
+    }
+     
+    public void InitLeaderBoard()
+    {
+        if (_scoreList != null)
+        {
+            ClearOldScores();
+
+            _scoreList.Sort(new ScoreComparer());
+            _scoreList.Reverse();
+
+            for (int i = 0; i < _scoreList.Count && i < _maxCountScores; i++)
+            {
+                GameObject score = Instantiate(ScorePrefab, ScoreContainer);
+
+                Text[] scoreLines = score.GetComponentsInChildren<Text>();
+                scoreLines[0].text = (i + 1).ToString();
+                scoreLines[1].text = _scoreList[i].Nickname;
+                scoreLines[2].text = _scoreList[i].Points.ToString();
+            }
+        }
+    }
+
+    private void ClearOldScores()
+    {
+        for (int i = 0; i < ScoreContainer.childCount; i++)
+        {
+            Destroy(ScoreContainer.GetChild(i).gameObject);
+        }
+    }
+
+    public int BestScore
+    {
+        get { return _scoreList.Max(s => s.Points); }
     }
 }

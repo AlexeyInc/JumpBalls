@@ -284,3 +284,4 @@ D:\MyUnityProjects\JumpBalls\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.
 D:\MyUnityProjects\JumpBalls\obj\Debug\Assembly-CSharp.csproj.CopyComplete
 D:\MyUnityProjects\JumpBalls\obj\Debug\Assembly-CSharp.dll
 D:\MyUnityProjects\JumpBalls\obj\Debug\Assembly-CSharp.pdb
+D:\MyUnityProjects\JumpBalls\Temp\bin\Debug\UnityEngine.WebGLModule.dll

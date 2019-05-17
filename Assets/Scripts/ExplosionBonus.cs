@@ -6,7 +6,7 @@ public class ExplosionBonus : MonoBehaviour
 {
     public GameObject pocket; 
     public float explosionPower;
-    public float timeFly = 2f;
+    public float timeFly;
 
     private Collider2D _playerCollider;
     private Collider2D[] _pocketColliders; 
@@ -18,6 +18,9 @@ public class ExplosionBonus : MonoBehaviour
     { 
         _balls = new List<Rigidbody2D>();
         _pocketColliders = pocket.GetComponents<Collider2D>();
+         
+        _goThoughColliders = new List<Collider2D>();
+        _goThoughColliders.AddRange(_pocketColliders);
     }
      
     public void MakeExplosion()
@@ -26,17 +29,21 @@ public class ExplosionBonus : MonoBehaviour
     } 
 
     public IEnumerator ExplosionProcess()
-    {
-        GameManager.Instance.ActiveGameLoop(false); 
+    { 
+        GameManager.Instance.ActiveGameLoop(false);
+
+        GameManager.Instance.PlayerController.IsGameActive(true); //Allow player move
         //-------------------------------
         DiactiveCollidersForBallsFlight();
-
-        yield return new WaitForSeconds(0.25f);
+         
         //-------------------------------
         float massInc = 0.5f;
         foreach (Rigidbody2D rb in _balls)
         {
-            rb.mass -= massInc;
+            if (rb != null)
+            {
+                rb.mass -= massInc;
+            }
         }
 
         float powerRange = 1.5f;
@@ -50,15 +57,20 @@ public class ExplosionBonus : MonoBehaviour
 
         foreach (Rigidbody2D rb in _balls)
         {
-            rb.mass += massInc;
+            if (rb != null)
+            { 
+                rb.mass += massInc;
+            }
         }
         _balls.Clear();
+        _balls = new List<Rigidbody2D>();
         //------------------------------- 
         ActiveCollidersAfterBallsFlight(); 
         //--------------------------------
-        yield return new WaitForSeconds(4.5f);
+        yield return new WaitForSeconds(4f);
          
-        GameManager.Instance.ActiveGameLoop(true);
+        GameManager.Instance.ActiveGameLoop(true); 
+
     }
 
     private void DiactiveCollidersForBallsFlight()
@@ -66,11 +78,8 @@ public class ExplosionBonus : MonoBehaviour
         if (_playerCollider == null)
         {
             _playerCollider = GameManager.Instance.PlayerController.gameObject.GetComponent<Collider2D>();
+            _goThoughColliders.Add(_playerCollider);
         }
-
-        _goThoughColliders = new List<Collider2D>();
-        _goThoughColliders.Add(_playerCollider);
-        _goThoughColliders.AddRange(_pocketColliders);
 
         foreach (Collider2D col in _goThoughColliders)
         {
